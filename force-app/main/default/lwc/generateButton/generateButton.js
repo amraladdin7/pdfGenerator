@@ -35,9 +35,9 @@ export default class GeneratePDF extends LightningElement {
         }
     }
 
-    secondTableHeader = [{id:'No.', name:'No.', prompt:'No.', width:20, align:'center', padding:0},
-                        {id:'Quantity.', name:'Quantity.', prompt:'Quantity.', width:105, align:'center', padding:0},
-                        {id:'Product Name', name:'Product Name', prompt:'Product Name', width:105, align:'center', padding:0}
+    secondTableHeader = [{id:'No.', name:'1', prompt:'   ', width:20, align:'center', padding:0},
+                        {id:'Quantity.', name:'2', prompt:'       ', width:105, align:'center', padding:0},
+                        {id:'Product Name', name:'3', prompt:'       ', width:105, align:'center', padding:0}
                     ];
     secondTableHeaderArabic = [{id:'رقم', name:'', prompt:'رقم', width:20, align:'center', padding:0},
                     {id:'عينة', name:'', prompt:'عينة', width:105, align:'center', padding:0},
@@ -114,7 +114,7 @@ export default class GeneratePDF extends LightningElement {
                 // doc.text(this.parsedData.Total_Amount__c, x1 - 10, 255);
                 doc.setFont("trado");
                 this.secondTableData = []
-                doc.table(12.5,150, this.secondTableData, this.secondTableHeaderArabic, {'autosize':true,'fontSize':12})
+                doc.table(12.5,150, this.secondTableData, this.secondTableHeader, {'autosize':true,'fontSize':12})
             } else {
                 x = 12.5;
                 x1 = 110;
