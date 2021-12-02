@@ -3,6 +3,7 @@ import { loadScript } from 'lightning/platformResourceLoader';
 import jspdf from '@salesforce/resourceUrl/jspdf';
 import tradoFont from '@salesforce/resourceUrl/trado';
 import PdfToGenerate from '@salesforce/apex/PdfGeneratorGetter.PdfToGenerate';
+import QuoteToGenerate from '@salesforce/apex/QuoteGetter.QuoteToGenerate';
 import logo from '@salesforce/resourceUrl/logo';
 
 export default class GeneratePDF extends LightningElement {
@@ -17,6 +18,8 @@ export default class GeneratePDF extends LightningElement {
     Generator;
     Invoice;
     Quote;
+    quoteId;
+    QuoteLineItems;
     // pdfImage;
     // finalImage;
 
@@ -26,8 +29,9 @@ export default class GeneratePDF extends LightningElement {
             this.Generator = result.data[0];
             // this.pdfImage = this.Generator.Image__c;
             console.log(this.Generator);
-            this.Invoice = this.Generator.Invoice;
-            this.Quote = this.Generator.Quote;
+            this.Invoice = this.Generator.Invoice__c;
+            this.quoteId = this.Generator.Quote__c;
+            console.log(this.quoteId);
             // let span = document.createElement('span');
             // span.innerHTML = this.pdfImage;
             // this.finalImage = span.querySelector('img');
@@ -35,13 +39,28 @@ export default class GeneratePDF extends LightningElement {
         }
     }
 
-    secondTableHeader = [{id:'No.', name:'1', prompt:'   ', width:20, align:'center', padding:0},
-                        {id:'Quantity.', name:'2', prompt:'       ', width:105, align:'center', padding:0},
-                        {id:'Product Name', name:'3', prompt:'       ', width:105, align:'center', padding:0}
+    @wire(QuoteToGenerate, {quoteId: '$quoteId'})
+    wiredQuote(result) {
+        if(result.data) {
+            console.log(result.data);
+            this.Quote = result.data;
+            this.QuoteLineItems = this.Quote.QuoteLineItems;
+            console.log('Quote: ', this.Quote);
+            console.log('Items: ' + this.QuoteLineItems);
+            this.secondTableData = this.generateDataValues();
+            console.log(this.secondTableData);
+        } else {
+            console.log(result.error);
+        }
+    }
+
+    secondTableHeader = [{id:'No.', name:'No.', prompt:'No.', width:20, align:'center', padding:0},
+                        {id:'Quantity.', name:'Quantity.', prompt:'Quantity.', width:105, align:'center', padding:0},
+                        {id:'Product Name', name:'Product Name', prompt:'Product Name', width:105, align:'center', padding:0}
                     ];
-    secondTableHeaderArabic = [{id:'رقم', name:'', prompt:'رقم', width:20, align:'center', padding:0},
-                    {id:'عينة', name:'', prompt:'عينة', width:105, align:'center', padding:0},
-                    {id:'اسم المنتج', name:'', prompt:'اسم المنتج', width:105, align:'center', padding:0}
+    secondTableHeaderArabic = [{id:'Product Name', name:'Product Name', prompt:'           ', width:105, align:'center', padding:0},
+                    {id:'Quantity.', name:'Quantity.', prompt:'          ', width:105, align:'center', padding:0},
+                    {id:'No.', name:'No.', prompt:'     ', width:20, align:'center', padding:0}
                 ];
     
     secondTableData = [];
@@ -82,7 +101,7 @@ export default class GeneratePDF extends LightningElement {
             let releasedDate, postCode, sampleName, sampleFor, dateX = "";
             let createdBy, vatNo, sampleAmount, customerName, printName = "";
             let dots = '.............................';
-            let x,x1;
+            let x,x1,ix,dx;
             let invoiceTo, deliverTo;
 
             if(this.language == "Arabic"){
@@ -93,7 +112,7 @@ export default class GeneratePDF extends LightningElement {
                 title = "تهامة القابضة";
                 x = 150;
                 x1 = 60;
-                delivery = "مذكرة";
+                delivery =(this.tem =='Invoice') ? "فاتورة" : "مذكرة";
                 note = "رقم";
                 // number = "رقم";
                 releasedDate = " تاريخ النشر";
@@ -106,15 +125,24 @@ export default class GeneratePDF extends LightningElement {
                 customerName = 'توقيع العميل';
                 printName = "اسم العميل";
                 dateX = "تاريخ";
-                invoiceTo = 'المذكرة الى'
-                doc.setFontSize(10);
+                invoiceTo = 'المذكرة الى';
+                deliverTo = 'توصيل الى';
+                ix = 70;
+                dx = 169;
+                this.secondTableData = this.generateDataValues();
+                doc.table(12.5,150, this.secondTableData, this.secondTableHeaderArabic, {'autosize':true,'fontSize':0});
+                doc.setFontSize(18); 
+                doc.setFont("trado");
+                let no = 'رقم';
+                let qu = 'الكمية';
+                let na = 'اسم المنتج';
+                doc.text(no ,173,157);
+                doc.text(qu ,127,157);
+                doc.text(na ,43,157);
                 // doc.text(this.parsedData.Name, x, 50)
                 // doc.text(this.parsedData.Account__c, x-30, 55)
                 // doc.text(this.parsedData.OwnerId, x -30, 60)
                 // doc.text(this.parsedData.Total_Amount__c, x1 - 10, 255);
-                doc.setFont("trado");
-                this.secondTableData = []
-                doc.table(12.5,150, this.secondTableData, this.secondTableHeader, {'autosize':true,'fontSize':12})
             } else {
                 x = 12.5;
                 x1 = 110;
@@ -132,10 +160,15 @@ export default class GeneratePDF extends LightningElement {
                 customerName = 'Customer Signature: ......................................';
                 printName = 'Print Name: ...................................';
                 dateX = 'Date: ................';
+                invoiceTo = 'Invoice to:';
+                deliverTo = 'Deliver to:';
+                ix = 14;
+                dx = 113;
                 // doc.text(this.parsedData.Name, x, 50)
                 // doc.text(this.parsedData.Account__c, x, 55)
                 // doc.text(this.parsedData.OwnerId, x, 60)
                 // doc.text(this.parsedData.Total_Amount__c, x1 - 10, 255);
+                this.secondTableData = this.generateDataValues();
                 doc.table(12.5,150, this.secondTableData, this.secondTableHeader, {'autosize':true,'fontSize':12})
             }
 
@@ -160,9 +193,9 @@ export default class GeneratePDF extends LightningElement {
             doc.text(createdBy, x + 20, 60);
             doc.text(vatNo, x + 20, 65);
             doc.rect(12.5, 70, 70,50);
-            doc.text('Invoice to:', 14, 75, {"maxWidth":45})
+            doc.text(invoiceTo, ix, 75, {"maxWidth":45})
             doc.rect(110, 70, 70, 50);
-            doc.text('Deliver to:', 113, 75, {"maxWidth":45});
+            doc.text(deliverTo, dx, 75, {"maxWidth":45});
 
             // doc.table(12.5,145, this.firstTableData, this.firstTableHeader, {'autosize':true,'fontSize':12})
             doc.text(sampleAmount, x1, 255)
@@ -184,19 +217,18 @@ export default class GeneratePDF extends LightningElement {
         }
         catch(error){
             console.log(error);
-            console.log(img);
-            console.log(this.image);
         }
     }
 
     generateDataValues(){
         try {
             var result = [];
-        for(let i = 0; i<this.sampleProducts.length; i+= 1){
+        for(let i = 0; i<this.QuoteLineItems.length; i++){
+            console.log(this.QuoteLineItems[i]);
             result.push({
                 "No.": `${i+1}`,
-                "Quantity.": `${this.sampleProducts[i].Quantity__c}`,
-                "Product Name": `${this.sampleProducts[i].Product__c}`
+                "Quantity.": `${this.QuoteLineItems[i].Quantity}`,
+                "Product Name": `${this.QuoteLineItems[i].Description}`
             })
         }
             return result;
@@ -208,11 +240,11 @@ export default class GeneratePDF extends LightningElement {
     generateDataValuesArabic(){
         try {
             var result = [];
-        for(let i = 0; i<this.sampleProducts.length; i+= 1){
+        for(let i = 0; i<this.QuoteLineItems.length; i++){
             result.push({
-                "رقم": `${i+1}`,
-                "عينة": `${this.sampleProducts[i].Quantity__c}`,
-                "اسم المنتج": `${this.sampleProducts[i].Product__c}`
+                "No.": `${i+1}`,
+                "Quantity.": `${this.QuoteLineItems[i].Quantity}`,
+                "Product Name": `${this.QuoteLineItems[i].Description}`
             })
         }
             return result;

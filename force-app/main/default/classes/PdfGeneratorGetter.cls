@@ -3,9 +3,7 @@ public with sharing class PdfGeneratorGetter {
     public static List<PDF_Generator__c> PdfToGenerate(String genId) {
         try {
             String query = 'SELECT '
-                     + 'Image__c, '
-                     +'(SELECT Name FROM Invoice), '
-                     +'(SELECT Name FROM Quote) '
+                     + 'Image__c, Invoice__c, Quote__c '
                      + 'FROM PDF_Generator__c';
             if (String.isNotBlank(genId)) {
                 query += ' WHERE Id = :genId';
