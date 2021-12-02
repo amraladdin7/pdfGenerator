@@ -4,7 +4,7 @@ public with sharing class QuoteGetter {
         try {
             String query = 'SELECT '
                      + 'Name, Profit_Margin__c, '
-                     + '(SELECT Description, Quantity FROM QuoteLineItems) '
+                     + '(SELECT Description, English_Name__c, Quantity FROM QuoteLineItems) '
                      + 'FROM Quote';
             if (String.isNotBlank(quoteId)) {
                 query += ' WHERE Id = :quoteId';

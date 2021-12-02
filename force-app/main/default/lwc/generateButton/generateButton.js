@@ -11,7 +11,6 @@ export default class GeneratePDF extends LightningElement {
     // @api disabled;
     @api text;
     @api language;
-    // @api image;
     @api tem;
     @track startX = 10;
     genId='';
@@ -20,8 +19,6 @@ export default class GeneratePDF extends LightningElement {
     Quote;
     quoteId;
     QuoteLineItems;
-    // pdfImage;
-    // finalImage;
 
     @wire(PdfToGenerate, {genId: '$genId'})
     wiredPdf(result) {
@@ -100,7 +97,6 @@ export default class GeneratePDF extends LightningElement {
             let title, delivery, note, number = "";
             let releasedDate, postCode, sampleName, sampleFor, dateX = "";
             let createdBy, vatNo, sampleAmount, customerName, printName = "";
-            let dots = '.............................';
             let x,x1,ix,dx;
             let invoiceTo, deliverTo;
 
@@ -114,7 +110,7 @@ export default class GeneratePDF extends LightningElement {
                 x1 = 60;
                 delivery =(this.tem =='Invoice') ? "فاتورة" : "مذكرة";
                 note = "رقم";
-                // number = "رقم";
+                number = this.Quote.Name;
                 releasedDate = " تاريخ النشر";
                 postCode = " الرمز البريدي";
                 sampleName = " اسم النموذج";
@@ -129,8 +125,9 @@ export default class GeneratePDF extends LightningElement {
                 deliverTo = 'توصيل الى';
                 ix = 70;
                 dx = 169;
-                this.secondTableData = this.generateDataValues();
+                this.secondTableData = this.generateDataValuesArabic();
                 doc.table(12.5,150, this.secondTableData, this.secondTableHeaderArabic, {'autosize':true,'fontSize':0});
+                this.generateDescription(doc);
                 doc.setFontSize(18); 
                 doc.setFont("trado");
                 let no = 'رقم';
@@ -144,12 +141,13 @@ export default class GeneratePDF extends LightningElement {
                 // doc.text(this.parsedData.OwnerId, x -30, 60)
                 // doc.text(this.parsedData.Total_Amount__c, x1 - 10, 255);
             } else {
+                this.startX = 40;
                 x = 12.5;
                 x1 = 110;
                 title = 'Tihama Holding';
                 delivery = (this.tem =='Invoice') ? "INVOICE" : "QUOTE";
                 note = "NO.";
-                // number = "No.";
+                number = this.Quote.Name;
                 releasedDate = 'Released Date: ';
                 postCode = 'Postcode';
                 sampleName = 'Sample Name: ';
@@ -181,7 +179,7 @@ export default class GeneratePDF extends LightningElement {
             img.src = logo;
             doc.addImage(img, 'png', 150,0,45,25);
             doc.text(note, x1, 42, {'maxWidth':50});
-            doc.text(number, x1, 64, {'maxWidth':50});
+            doc.text(number, x1, 54, {'maxWidth':50});
             
             doc.setFontSize(10);
             var today = new Date();
@@ -210,7 +208,7 @@ export default class GeneratePDF extends LightningElement {
             var currText = this.text;
             var currX = this.startX;
 
-            doc.text(currText, currX, 200, {'maxWidth':175});
+            doc.text(currText, currX, 250, {'maxWidth':175});
             // console.log(this.finalImage);
             // doc.addImage(this.finalImage, 'png', 150,0,45,25);
             doc.save('table.pdf');
@@ -228,7 +226,7 @@ export default class GeneratePDF extends LightningElement {
             result.push({
                 "No.": `${i+1}`,
                 "Quantity.": `${this.QuoteLineItems[i].Quantity}`,
-                "Product Name": `${this.QuoteLineItems[i].Description}`
+                "Product Name": `${this.QuoteLineItems[i].English_Name__c}`,
             })
         }
             return result;
@@ -244,13 +242,23 @@ export default class GeneratePDF extends LightningElement {
             result.push({
                 "No.": `${i+1}`,
                 "Quantity.": `${this.QuoteLineItems[i].Quantity}`,
-                "Product Name": `${this.QuoteLineItems[i].Description}`
+                "Product Name": ` `
             })
         }
             return result;
         } 
         catch(e) {
             console.log(e);
+        }
+    }
+    generateDescription(context) {
+        let descriptionYPosition = 167;
+        context.setFont("trado");
+        context.setFontSize(14);
+        for(let i = 0; i<this.QuoteLineItems.length; i++) { 
+            if(this.QuoteLineItems[i].Description)
+            context.text(this.QuoteLineItems[i].Description, 43, descriptionYPosition);
+            descriptionYPosition += 11;
         }
     }
 }
