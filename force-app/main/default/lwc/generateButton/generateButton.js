@@ -9,6 +9,7 @@ import logo from '@salesforce/resourceUrl/logo';
 export default class GeneratePDF extends LightningElement {
 
     // @api disabled;
+    @track isLoading = false;
     @api text;
     @api language;
     @api tem;
@@ -63,6 +64,7 @@ export default class GeneratePDF extends LightningElement {
     secondTableData = [];
 
     renderedCallback() {
+        // this.isLoading = false;
         if(this.jspdfLoaded)
             return;
         this.jspdfLoaded = true;
@@ -76,6 +78,7 @@ export default class GeneratePDF extends LightningElement {
     }
 
     generate() {
+        this.isLoading = true;
         try{
             const {jsPDF} = window.jspdf;
             const doc = new jsPDF({
@@ -212,6 +215,10 @@ export default class GeneratePDF extends LightningElement {
             // console.log(this.finalImage);
             // doc.addImage(this.finalImage, 'png', 150,0,45,25);
             doc.save('table.pdf');
+            setTimeout(() =>{
+                this.isLoading = false;
+            }, 500);
+            // this.isLoading = false;
         }
         catch(error){
             console.log(error);
