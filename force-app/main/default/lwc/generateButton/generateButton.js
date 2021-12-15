@@ -7,7 +7,7 @@ import QuoteToGenerate from '@salesforce/apex/QuoteGetter.QuoteToGenerate';
 import logo from '@salesforce/resourceUrl/logo';
 
 export default class GeneratePDF extends LightningElement {
-
+   
     // @api disabled;
     @track isLoading = false;
     @api text;
@@ -25,15 +25,15 @@ export default class GeneratePDF extends LightningElement {
     wiredPdf(result) {
         if(result.data) {
             this.Generator = result.data[0];
-            // this.pdfImage = this.Generator.Image__c;
+            this.pdfImage = this.Generator.Image__c;
             console.log(this.Generator);
             this.Invoice = this.Generator.Invoice__c;
             this.quoteId = this.Generator.Quote__c;
             console.log(this.quoteId);
-            // let span = document.createElement('span');
-            // span.innerHTML = this.pdfImage;
-            // this.finalImage = span.querySelector('img');
-            // console.log(this.finalImage);
+            let span = document.createElement('span');
+            span.innerHTML = this.pdfImage;
+            this.finalImage = span.querySelector('img');
+            console.log(this.finalImage);
         }
     }
 
@@ -77,6 +77,16 @@ export default class GeneratePDF extends LightningElement {
         });
     }
 
+    generateContract(){
+        try{
+            
+            doc.save('table.pdf');
+        }
+        catch(error){
+            console.log(error);
+        }
+    }
+
     generate() {
         this.isLoading = true;
         try{
@@ -89,7 +99,36 @@ export default class GeneratePDF extends LightningElement {
                 // },
                 format: "a4"
             });
-
+            
+            if(this.tem == 'Contract'){
+                doc.setFontSize(24);
+                doc.text("CONTRACT TEMPLATE",55,35);
+                doc.setFontSize(10);
+                let firstparagraph = "  This contract in entered into by and between __________________, [AN INDIVIDUAL, OR TYPE OF BUSINESS ENTITY] ('First Party'), and ___________________, [AN INDIVIDUAL, OR TYPE OF BUSINESS ENTITY] ('Second Party'). The term of this Agreemant shall begin on _______________ and shall continue through its termination date of ________________.";
+                doc.text(firstparagraph, 20, 50, {maxWidth:170})
+                doc.text("The specific terms of this contract are as follows:", 25, 75)
+                let secondparagraph = "  In consideration of the mutual promises set forth herein, the First Party convenants and agrees it shall __________"
+                let underscores = "______________________________________________________________________________________________________________________________________________________________________"
+                doc.text(secondparagraph + underscores, 25, 130, {maxWidth:170})
+                doc.text("  The Second party covenants and agrees that it shall __________________________________________________________"+underscores, 25, 150, {maxWidth:170})
+                let thirdparagraph = "  This contract may not be modified in any manner unless in writing and signed by both parties. This document and any attachments hereto constitute the entire agreement between the parties. This contract shall be binding upon the parties, their successors, heirs and assigns shall be enforced under the laws of the State of ______________.";
+                doc.text(thirdparagraph, 25, 175, {maxWidth:170})
+                doc.text("______________________________", 40, 200)
+                doc.text("(Signature)", 50, 205)
+                doc.text("______________________________", 110, 200)
+                doc.text("(Signature)", 120, 205)
+                doc.text("______________________________", 40, 215)
+                doc.text("(Printed Name)", 50, 220)
+                doc.text("______________________________", 110, 215)
+                doc.text("(Printed Name)", 120, 220)
+                doc.text("______________________________", 40, 230)
+                doc.text("(Address)", 50, 235)
+                doc.text("______________________________", 110, 230)
+                doc.text("(Address)", 120, 235)
+                doc.text("Date: ________________, 20___", 40, 250)
+                doc.text("Date: ________________, 20___", 110, 250)
+                doc.save('contract.pdf')
+            }
             if(this.template == undefined) {
                 this.template = 'Invoice';
             }
@@ -212,8 +251,8 @@ export default class GeneratePDF extends LightningElement {
             var currX = this.startX;
 
             doc.text(currText, currX, 250, {'maxWidth':175});
-            // console.log(this.finalImage);
-            // doc.addImage(this.finalImage, 'png', 150,0,45,25);
+            console.log(this.finalImage);
+            doc.addImage(this.finalImage, 'png', 150,0,45,25);
             doc.save('table.pdf');
             setTimeout(() =>{
                 this.isLoading = false;
