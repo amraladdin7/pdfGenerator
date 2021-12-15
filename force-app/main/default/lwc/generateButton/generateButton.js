@@ -100,7 +100,7 @@ export default class GeneratePDF extends LightningElement {
                 format: "a4"
             });
             
-            if(this.tem == 'Contract'){
+            if(this.tem == 'Contract' && this.language == 'English'){
                 doc.setFontSize(24);
                 doc.text("CONTRACT TEMPLATE",55,35);
                 doc.setFontSize(10);
@@ -127,6 +127,44 @@ export default class GeneratePDF extends LightningElement {
                 doc.text("(Address)", 120, 235)
                 doc.text("Date: ________________, 20___", 40, 250)
                 doc.text("Date: ________________, 20___", 110, 250)
+                doc.save('contract.pdf')
+            }
+            if(this.tem == 'Contract' && this.language == 'Arabic'){
+                doc.addFont(tradoFont, "trado", "normal");
+                doc.setFont('trado')
+                doc.setFontSize(24);
+                doc.text("نموذج العقد",110,35);
+                doc.setFontSize(14);
+                let underscore = "____________"
+                let firstparagraph = "تم إبرام هذا العقد بين __________________، و ___________________ . تبدأ مدة هذه الاتفاقية في _______________ وتستمر حتى تاريخ انتهائها في";
+                doc.text(firstparagraph, 180, 50, {maxWidth:170, align:"right"})
+                doc.text(underscore, 50, 55.5)
+                let conditions = "الشروط المحددة لهذا العقد هي كما يلي"
+                doc.text(conditions, 180, 70, {align:"right"})
+                let secondparagraph = "بالنظر إلى الوعود المتبادلة المنصوص عليها في هذه الوثيقة ، يقر الطرف الأول ويوافق على ذلك"
+                let underscores = "______________________________________________________________________________________________________________________________________________________________________"
+                doc.text(secondparagraph + underscores, 180, 130, {maxWidth:170, align:"right"})
+                let secondparty = "                                                                                     يتعهد الطرف الثاني ويوافق على ذلك"
+                doc.text(secondparty + underscores, 180, 160, {maxWidth:170, align:"right"})
+                let thirdparagraph = "لا يجوز تعديل هذا العقد بأي شكل من الأشكال إلا إذا كان مكتوبًا وموقعًا من قبل الطرفين. تشكل هذه الوثيقة وأي مرفقات بها الاتفاقية الكاملة بين الطرفين. يجب أن يكون هذا العقد ملزمًا للأطراف وخلفائهم وورثتهم والمتنازل لهم بموجب قوانين ولاية";
+                doc.text(thirdparagraph, 180, 185, {maxWidth:170, align:"right"})
+                doc.text(underscore, 65, 197)
+                doc.text("__________________________", 40, 205)
+                doc.text("(توقيع)", 80, 210, {align:"right"})
+                doc.text("__________________________", 110, 205)
+                doc.text("(توقيع)", 140, 210, {align:"right"})
+                doc.text("__________________________", 40, 220)
+                doc.text("(الاسم)", 80, 225, {align:"right"})
+                doc.text("__________________________", 110, 220)
+                doc.text("(الاسم)", 140, 225, {align:"right"})
+                doc.text("__________________________", 40, 235)
+                doc.text("(العنوان)", 80, 240, {align:"right"})
+                doc.text("__________________________", 110, 235)
+                doc.text("(العنوان)", 140, 240, {align:"right"})
+                doc.text("التاريخ", 180, 260, {align:"right"})
+                doc.text(underscore, 165, 260, {align:"right"})
+                doc.text("التاريخ", 80, 260, {align:"right"})
+                doc.text(underscore, 65, 260, {align:"right"})
                 doc.save('contract.pdf')
             }
             if(this.template == undefined) {
