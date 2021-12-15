@@ -6,7 +6,8 @@ export default class LanguageSelector extends LightningElement {
     get options() {
         return [
             { label: 'Invoice', value: 'Invoice'},
-            { label: 'Quote', value: 'Quote'}
+            { label: 'Quote', value: 'Quote'},
+            { label: 'Contract', value: 'Contract'}
         ];
     }
 
