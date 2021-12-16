@@ -5,6 +5,9 @@ import tradoFont from '@salesforce/resourceUrl/trado';
 import PdfToGenerate from '@salesforce/apex/PdfGeneratorGetter.PdfToGenerate';
 import QuoteToGenerate from '@salesforce/apex/QuoteGetter.QuoteToGenerate';
 import logo from '@salesforce/resourceUrl/logo';
+import ImageLogoUpdate from '@salesforce/apex/ImageLogo.ImageLogoUpdate';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { updateRecord } from 'lightning/uiRecordApi';
 
 export default class GeneratePDF extends LightningElement {
 
@@ -25,15 +28,17 @@ export default class GeneratePDF extends LightningElement {
     wiredPdf(result) {
         if(result.data) {
             this.Generator = result.data[0];
-            // this.pdfImage = this.Generator.Image__c;
+            this.pdfImage = this.Generator.Image2__c;
             console.log(this.Generator);
             this.Invoice = this.Generator.Invoice__c;
             this.quoteId = this.Generator.Quote__c;
             console.log(this.quoteId);
-            // let span = document.createElement('span');
-            // span.innerHTML = this.pdfImage;
-            // this.finalImage = span.querySelector('img');
-            // console.log(this.finalImage);
+            let span = document.createElement('span');
+            console.log(this.pdfImage);
+            span.innerHTML = this.pdfImage;
+            this.finalImage = span.querySelector('img');
+            console.log(this.finalImage);
+            console.log(logo);
         }
     }
 
@@ -46,7 +51,7 @@ export default class GeneratePDF extends LightningElement {
             console.log('Quote: ', this.Quote);
             console.log('Items: ' + this.QuoteLineItems);
             this.secondTableData = this.generateDataValues();
-            console.log(this.secondTableData);
+            console.log(this.Quote);
         } else {
             console.log(result.error);
         }
@@ -74,7 +79,18 @@ export default class GeneratePDF extends LightningElement {
             let pathname = window.location.pathname;
             this.genId = pathname.substring(30, 48);
             console.log(this.genId);
-        });
+            console.log(logo);
+        })
+        .then(() => {
+            ImageLogoUpdate({genId: this.genId, logo: logo});
+        })
+        .then(result => {
+            console.log(result);
+            updateRecord({fields: this.genId});
+        })
+        .catch(err => {
+            console.log(err);
+        })
     }
 
     generate() {
@@ -180,7 +196,7 @@ export default class GeneratePDF extends LightningElement {
             doc.text(delivery, x1, 35, {'maxWidth':50});
             var img = new Image();
             img.src = logo;
-            doc.addImage(img, 'png', 150,0,45,25);
+            // doc.addImage(img, 'png', 150,0,45,25);
             doc.text(note, x1, 42, {'maxWidth':50});
             doc.text(number, x1, 54, {'maxWidth':50});
             
@@ -213,7 +229,7 @@ export default class GeneratePDF extends LightningElement {
 
             doc.text(currText, currX, 250, {'maxWidth':175});
             // console.log(this.finalImage);
-            // doc.addImage(this.finalImage, 'png', 150,0,45,25);
+            doc.addImage(this.finalImage, 'png', 150,0,45,25);
             doc.save('table.pdf');
             setTimeout(() =>{
                 this.isLoading = false;
@@ -222,6 +238,13 @@ export default class GeneratePDF extends LightningElement {
         }
         catch(error){
             console.log(error);
+            const errorEvent = new ShowToastEvent({
+                title: 'An Error has occurred',
+                message: error.message,
+                variant: 'error',
+                mode: 'dismissable'
+            });
+            this.dispatchEvent(errorEvent);
         }
     }
 
