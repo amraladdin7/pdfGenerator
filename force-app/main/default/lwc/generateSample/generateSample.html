@@ -1,0 +1,8 @@
+<template>
+    <template if:true={isLoading}>
+        <lightning-spinner variant="brand" size="small" alternative-text="Loading"></lightning-spinner>
+    </template>
+    <template if:false={isLoading}>
+        <lightning-button label="Generate Sample" onclick={generate}></lightning-button>
+    </template>
+</template>
