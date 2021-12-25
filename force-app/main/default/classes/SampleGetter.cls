@@ -1,10 +1,11 @@
 public with sharing class SampleGetter {
     @AuraEnabled(cacheable = true)
-    public static Sample_Product__c SampleToGet(String sampleId) {
+    public static Sample__c SampleToGet(String sampleId) {
         try {
             String query = 'SELECT '
-                     + 'Name, Quantity__c, List_Price__c, Product__R.Name '
-                     + 'FROM Sample_Product__c ';
+                     + 'Name, Total_Amount__c,OwnerId, '
+                     + '(SELECT Product__r.Name FROM Sample_Products__r) '
+                     + 'FROM Sample__c ';
                      if (String.isNotBlank(sampleId)) {
                         query += 'WHERE Id = :sampleId';
                     }
