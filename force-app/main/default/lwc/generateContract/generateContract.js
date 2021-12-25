@@ -56,8 +56,7 @@ export default class GenerateContract extends LightningElement {
                  doc.text(firstparagraph, 20, 50, {maxWidth:170})
                  doc.text("The specific terms of this contract are as follows:", 25, 75)
                  doc.text(this.text, 25, 82.5)
-                 let secondparagraph = "  In consideration of the mutual promises set forth herein, the First Party convenants and agrees it shall ";
-                 doc.text(secondparagraph + this.description, 25, 130, {maxWidth:170})
+                 doc.text(this.description, 25, 130, {maxWidth:170})
                  
                  doc.text("______________________________", 40, 200)
                  doc.text("(Signature)", 50, 205)
@@ -81,15 +80,19 @@ export default class GenerateContract extends LightningElement {
                  doc.text("نموذج العقد",110,35);
                  doc.setFontSize(14);
                  let underscore = "____________"
-                 let firstparagraph = "تم إبرام هذا العقد بين تهامة، و ___________________ . تبدأ مدة هذه الاتفاقية في  ";
-                 let endpara = " وتستمر حتى تاريخ انتهائها في"
-                 doc.text(firstparagraph + this.Contract.StartDate, 180, 50, {maxWidth:190, align:"right"})
+                 let firstparagraph = "تم إبرام هذا العقد بين تهامة، و";
+                 let sec = " تبدأ مدة هذه الاتفاقية في"
+                 let endpara = " وتستمر حتى تاريخ انتهائها في";
+                 doc.text(firstparagraph, 180, 50, {maxWidth:190, align:"right"})
+                 doc.text(this.Contract.Account.Name, 105, 50)
+                 doc.text(sec + this.Contract.StartDate, 100, 50, {maxWidth:190, align:"right"})
+
                  doc.text(endpara + this.Contract.EndDate, 180, 55, {align:"right"})
                 
                  let conditions = "الشروط المحددة لهذا العقد هي كما يلي"
                  doc.text(conditions, 180, 70, {align:"right"})
-                 let secondparagraph = "بالنظر إلى الوعود المتبادلة المنصوص عليها في هذه الوثيقة ، يقر الطرف الأول ويوافق على ذلك"
-                 doc.text(secondparagraph + this.description, 180, 130, {maxWidth:170, align:"right"})
+                 doc.text(this.text, 180, 75, {align:"right"})
+                 doc.text(this.description, 180, 130, {maxWidth:170, align:"right"})
             
                  doc.text("__________________________", 40, 205)
                  doc.text("(توقيع)", 80, 210, {align:"right"})
