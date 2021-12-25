@@ -3,7 +3,7 @@ public with sharing class InvoiceGetter {
     public static Order InvoiceToGet(String invoiceId) {
         try {
             String query = 'SELECT '
-                     + 'TotalAmount, Name, OrderNumber, ' 
+                     + 'TotalAmount, Name, OrderNumber, OwnerId, ' 
                      + '(SELECT Quantity, TotalPrice, UnitPrice, Product2.Name FROM OrderItems) '
                      + 'FROM Order';
             if (String.isNotBlank(invoiceId)) {
