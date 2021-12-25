@@ -46,9 +46,9 @@ export default class GenerateInvoice extends LightningElement {
                         {id:'Product Name', name:'Product Name', prompt:'Product Name', width:70, align:'center', padding:0},
                         {id:'Unit Price',name:'Unit Price', prompt:'Unit Price', width:70, align:'center', padding:0}
                     ];
-    secondTableHeaderArabic = [{id:'Product Name', name:'Product Name', prompt:'           ', width:70, align:'center', padding:0},
+    secondTableHeaderArabic = [{id:'Unit Price',name:'Unit Price', prompt:'          ', width:70, align:'center', padding:0},
+                    {id:'Product Name', name:'Product Name', prompt:'           ', width:70, align:'center', padding:0},
                     {id:'Quantity.', name:'Quantity.', prompt:'          ', width:70, align:'center', padding:0},
-                    {id:'Unit Price',name:'Unit Price', prompt:'          ', width:70, align:'center', padding:0},
                     {id:'No.', name:'No.', prompt:'     ', width:20, align:'center', padding:0}  
                 ];
     
@@ -68,7 +68,7 @@ export default class GenerateInvoice extends LightningElement {
 
             let title, delivery, note, number = "";
             let releasedDate, postCode, sampleName, sampleFor, dateX = "";
-            let createdBy, vatNo, sampleAmount, customerName, printName = "";
+            let createdBy, vatNo, sampleAmount, customerName, printName, alignment = "";
             let x,x1,ix,dx;
             let invoiceTo, deliverTo;
 
@@ -76,6 +76,7 @@ export default class GenerateInvoice extends LightningElement {
                 doc.addFont(tradoFont, "trado", "normal");
                 doc.setFont("trado");
                 this.startX = 150; 
+                alignment = "right"
                 doc.setFontSize(24)
                 title = "تهامة القابضة";
                 x = 160;
@@ -112,12 +113,20 @@ export default class GenerateInvoice extends LightningElement {
                 doc.setFontSize(10);
                 doc.text(sampleName, x, 50);
                 doc.text(this.Invoice.OrderNumber, x - 20, 50)
+                doc.text(sampleAmount + this.Invoice.TotalAmount, x1, 255)
+                doc.text("$", x1 - 3, 255)
+                doc.text(createdBy, x + 12.5, 45, {align: alignment});
+                doc.text(this.Invoice.OwnerId, x, 45, {align:alignment})
+                var today = new Date();
+                var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                doc.text(releasedDate + date, x+12.5, 40, {align: alignment});
                 // doc.text(this.parsedData.Name, x, 50)
                 // doc.text(this.parsedData.Account__c, x-30, 55)
                 // doc.text(this.parsedData.OwnerId, x -30, 60)
                 // doc.text(this.parsedData.Total_Amount__c, x1 - 10, 255);
             } else {
                 this.startX = 40;
+                alignment = "left"
                 x = 12.5;
                 x1 = 110;
                 title = 'Tihama Holding';
@@ -125,9 +134,7 @@ export default class GenerateInvoice extends LightningElement {
                 note = "NO.";
                 number = this.Invoice.OrderNumber;
                 releasedDate = 'Released Date: ';
-                postCode = 'Postcode';
-                sampleName = 'Order Name: ';
-                sampleFor = 'Order for: ';
+                sampleName = 'Invoice Name: ';
                 createdBy = 'Created by: ';
                 vatNo = 'VAT No.';
                 sampleAmount = 'Total Order Amount: ' ;
@@ -141,6 +148,11 @@ export default class GenerateInvoice extends LightningElement {
                 doc.setFontSize(10);
                 doc.text(sampleName + this.Invoice.OrderNumber, x, 50);
                 doc.table(12.5,150, this.secondTableData, this.secondTableHeader, {'autosize':true,'fontSize':12})
+                doc.text(sampleAmount + this.Invoice.TotalAmount + "$", x1, 255)
+                doc.text(createdBy + this.Invoice.OwnerId, x, 45);
+                var today = new Date();
+                var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                doc.text(releasedDate + date, x, 40, {align: alignment});
                 // doc.text(this.parsedData.Name, x, 50)
                 // doc.text(this.parsedData.Account__c, x, 55)
                 // doc.text(this.parsedData.OwnerId, x, 60)
@@ -161,23 +173,21 @@ export default class GenerateInvoice extends LightningElement {
             doc.text(number, x1, 54, {'maxWidth':50});
             
             doc.setFontSize(10);
-            var today = new Date();
-            var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-            doc.text(releasedDate + " " + date, x, 40);
-            doc.text(postCode, x, 45);
-            doc.text(sampleAmount + this.Invoice.TotalAmount, x1, 255)
-            doc.text(sampleFor, x, 55);
-            doc.text(createdBy, x, 60);
-            doc.text(vatNo, x, 65);
+            
+           
+            
+            
+            doc.text(vatNo, x, 55);
             doc.rect(12.5, 70, 70,50);
             doc.text(invoiceTo, ix, 75, {"maxWidth":45})
             doc.rect(110, 70, 70, 50);
             doc.text(deliverTo, dx, 75, {"maxWidth":45});
 
             // doc.table(12.5,145, this.firstTableData, this.firstTableHeader, {'autosize':true,'fontSize':12})
-            doc.text(sampleAmount + this.Invoice.TotalAmount, x1, 255)
+            
             // doc.text(dots, x1-30, 255);
             doc.text(customerName, x + 20, 275, {'maxWidth':150});
+
             // doc.text(dots, x-10, 275);
             doc.text(printName, x + 20, 285, {'maxWidth':150});
             // doc.text(dots, x - 10, 285);
@@ -203,7 +213,7 @@ export default class GenerateInvoice extends LightningElement {
                 "No.": `${i+1}`,
                 "Quantity.": `${this.orderItems[i].Quantity}`,
                 "Product Name": `${this.orderItems[i].Product2.Name}`,
-                "Unit Price" : `${this.orderItems[i].UnitPrice}`
+                "Unit Price" : `${this.orderItems[i].UnitPrice}` + "$"
             })
         }
             return result;
@@ -219,8 +229,8 @@ export default class GenerateInvoice extends LightningElement {
             result.push({
                 "No.": `${i+1}`,
                 "Quantity.": `${this.orderItems[i].Quantity}`,
-                "Product Name": ` `,
-                "Unit Price" : `${this.orderItems[i].UnitPrice}`
+                "Product Name": `${this.orderItems[i].Product2.Name}`,
+                "Unit Price" : `${this.orderItems[i].UnitPrice}` +  "$"
             })
         }
             return result;
