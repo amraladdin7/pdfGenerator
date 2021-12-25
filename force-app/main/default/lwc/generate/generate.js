@@ -33,9 +33,9 @@ export default class Generate extends LightningElement {
                         {id:'Product Name', name:'Product Name', prompt:'Product Name', width:70, align:'center', padding:0},
                         {id:'Unit Price',name:'Unit Price', prompt:'Unit Price', width:70, align:'center', padding:0}
                     ];
-    secondTableHeaderArabic = [{id:'Product Name', name:'Product Name', prompt:'           ', width:70, align:'center', padding:0},
+    secondTableHeaderArabic = [{id:'Unit Price',name:'Unit Price', prompt:'          ', width:70, align:'center', padding:0},
+                    {id:'Product Name', name:'Product Name', prompt:'           ', width:70, align:'center', padding:0},
                     {id:'Quantity.', name:'Quantity.', prompt:'          ', width:70, align:'center', padding:0},
-                    {id:'Unit Price',name:'Unit Price', prompt:'          ', width:70, align:'center', padding:0},
                     {id:'No.', name:'No.', prompt:'     ', width:20, align:'center', padding:0}  
                 ];
     
@@ -64,10 +64,6 @@ export default class Generate extends LightningElement {
                 format: "a4"
             });
             
-    
-            if(this.template == undefined) {
-                this.template = 'Invoice';
-            }
             if(this.language == undefined) {
                 this.language = 'Arabic';
             }
@@ -90,9 +86,7 @@ export default class Generate extends LightningElement {
                 note = "رقم";
                 number = this.Quote.Name;
                 releasedDate = " تاريخ النشر";
-                postCode = " الرمز البريدي";
                 sampleName = " اسم النموذج";
-                sampleFor = 'عينة لـ';
                 createdBy = "انشأ من قبل";
                 vatNo = "الرقم الضريبى";
                 sampleAmount = " اجمالى كمية النموذج";
@@ -118,9 +112,12 @@ export default class Generate extends LightningElement {
                 doc.text(price, 25, 157)
                 alignment = "right";
                 doc.setFontSize(10);
-                doc.text(sampleName, x + 5, 50, {align: alignment});
-                doc.text(this.Quote.Name, x - 10, 50, {align: alignment});
-                
+                doc.text(sampleName, x + 5, 45, {align: alignment});
+                doc.text(this.Quote.Name, x - 10, 45, {align: alignment});
+                doc.text(sampleAmount + this.Quote.TotalPrice, x1, 255)
+                doc.text("$", x1, 255)
+                doc.text(createdBy, x + 5, 50, {align: alignment});
+                doc.text(this.Quote.OwnerId, x - 10, 50, {align:alignment})
                 // doc.text(this.parsedData.Name, x, 50)
                 // doc.text(this.parsedData.Account__c, x-30, 55)
                 // doc.text(this.parsedData.OwnerId, x -30, 60)
@@ -134,9 +131,7 @@ export default class Generate extends LightningElement {
                 note = "NO.";
                 number = this.Quote.Name;
                 releasedDate = 'Released Date: ';
-                postCode = 'Postcode';
                 sampleName = 'Quote Name: ';
-                sampleFor = 'Quote for: ';
                 createdBy = 'Created by: ';
                 vatNo = 'VAT No.';
                 sampleAmount = 'Total Quote Amount: ' ;
@@ -154,8 +149,10 @@ export default class Generate extends LightningElement {
                 // doc.text(this.parsedData.Total_Amount__c, x1 - 10, 255);
                 this.secondTableData = this.generateDataValues();
                 doc.setFontSize(10);
-                doc.text(sampleName + this.Quote.Name, x + 5, 50, {align: alignment});
+                doc.text(sampleName + this.Quote.Name, x + 5, 45, {align: alignment});
                 doc.table(12.5,150, this.secondTableData, this.secondTableHeader, {'autosize':true,'fontSize':12})
+                doc.text(sampleAmount + this.Quote.TotalPrice + "$", x1, 255)
+                doc.text(createdBy + this.Quote.OwnerId, x + 5, 50, {align: alignment});
             }
 
             doc.setFont("trado");
@@ -173,18 +170,15 @@ export default class Generate extends LightningElement {
             var today = new Date();
             var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
             doc.text(releasedDate + date, x + 5, 40, {align: alignment});
-            doc.text(postCode, x + 5, 45, {align: alignment});
-            
-            doc.text(sampleFor, x + 5, 55, {align: alignment});
-            doc.text(createdBy, x + 5, 60, {align: alignment});
-            doc.text(vatNo, x + 5, 65, {align: alignment});
+           
+            doc.text(vatNo, x + 5, 55, {align: alignment});
             doc.rect(12.5, 70, 70,50);
             doc.text(invoiceTo, ix, 75, {"maxWidth":45})
             doc.rect(110, 70, 70, 50);
             doc.text(deliverTo, dx, 75, {"maxWidth":45});
 
             // doc.table(12.5,145, this.firstTableData, this.firstTableHeader, {'autosize':true,'fontSize':12})
-            doc.text(sampleAmount + this.Quote.TotalPrice, x1, 255)
+            
             // doc.text(dots, x1-30, 255);
             doc.text(customerName, x + 20, 275, {'maxWidth':150});
             // doc.text(dots, x-10, 275);
@@ -213,7 +207,7 @@ export default class Generate extends LightningElement {
                 "No.": `${i+1}`,
                 "Quantity.": `${this.QuoteLineItems[i].Quantity}`,
                 "Product Name": `${this.QuoteLineItems[i].Product2.Name}`,
-                "Unit Price" : `${this.QuoteLineItems[i].ListPrice}`
+                "Unit Price" : `${this.QuoteLineItems[i].ListPrice}` + "$"
             })
         }
             return result;
@@ -229,8 +223,8 @@ export default class Generate extends LightningElement {
             result.push({
                 "No.": `${i+1}`,
                 "Quantity.": `${this.QuoteLineItems[i].Quantity}`,
-                "Product Name": ` `,
-                "Unit Price" : ` `
+                "Product Name": `${this.QuoteLineItems[i].Product2.Name}`,
+                "Unit Price" : `${this.QuoteLineItems[i].ListPrice}` + "$"
             })
         }
             return result;
