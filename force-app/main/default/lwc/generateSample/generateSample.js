@@ -4,6 +4,7 @@ import jspdf from '@salesforce/resourceUrl/jspdf';
 import tradoFont from '@salesforce/resourceUrl/trado';
 import SampleToGet from '@salesforce/apex/SampleGetter.SampleToGet';
 import logo from '@salesforce/resourceUrl/logo';
+import UserPermissionsCallCenterAutoLogin from '@salesforce/schema/User.UserPermissionsCallCenterAutoLogin';
 
 export default class GenerateSample extends LightningElement {
     @track isLoading = false;
@@ -33,7 +34,7 @@ export default class GenerateSample extends LightningElement {
         .then(() => {
             console.log(this);
             let pathname = window.location.pathname;
-            this.sampleId = pathname.substring(31, 49);
+            this.sampleId = pathname.substring(23, 41);
         });
     }
 
@@ -51,7 +52,7 @@ export default class GenerateSample extends LightningElement {
 
             let title, delivery, note, number = "";
             let releasedDate, postCode, sampleName, sampleFor, dateX = "";
-            let createdBy, vatNo, sampleAmount, customerName, printName = "";
+            let createdBy, vatNo, sampleAmount, customerName, printName, alignment = "";
             let x,x1,ix,dx;
             let invoiceTo, deliverTo;
 
@@ -80,15 +81,24 @@ export default class GenerateSample extends LightningElement {
                 deliverTo = 'توصيل الى';
                 ix = 70;
                 dx = 169;
-                
-                doc.setFontSize(18); 
-                doc.setFont("trado");
-                let no = 'رقم';
-                let qu = 'الكمية';
-                let na = 'اسم المنتج';
-                doc.text(no ,173,157);
-                doc.text(qu ,127,157);
-                doc.text(na ,43,157);
+                alignment = "right"
+                doc.setFontSize(10);
+                doc.text(sampleName, x + 20, 45, {align: alignment});
+                doc.text(this.Sample.Name, x, 45, {align: alignment});
+                doc.text(createdBy, x + 20, 50, {align: alignment});
+                doc.text(this.Sample.OwnerId, x, 50, {align:alignment})
+                var today = new Date();
+                var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                doc.text(releasedDate + " " + date, x + 20, 40, {align:alignment});
+                doc.text(vatNo, x + 25, 55);
+                // doc.setFontSize(18); 
+                // doc.setFont("trado");
+                // let no = 'رقم';
+                // let qu = 'الكمية';
+                // let na = 'اسم المنتج';
+                // doc.text(no ,173,157);
+                // doc.text(qu ,127,157);
+                // doc.text(na ,43,157);
                 // doc.text(this.parsedData.Name, x, 50)
                 // doc.text(this.parsedData.Account__c, x-30, 55)
                 // doc.text(this.parsedData.OwnerId, x -30, 60)
@@ -115,6 +125,14 @@ export default class GenerateSample extends LightningElement {
                 deliverTo = 'Deliver to:';
                 ix = 14;
                 dx = 113;
+                alignment = "left"
+                doc.setFontSize(10);
+                doc.text(sampleName + " " + this.Sample.Name, x, 45);
+                doc.text(createdBy + this.Sample.OwnerId, x, 50);
+                var today = new Date();
+                var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                doc.text(releasedDate + " " + date, x, 40, {align:alignment});
+                doc.text(vatNo, x, 55);
                 // doc.text(this.parsedData.Name, x, 50)
                 // doc.text(this.parsedData.Account__c, x, 55)
                 // doc.text(this.parsedData.OwnerId, x, 60)
@@ -136,21 +154,17 @@ export default class GenerateSample extends LightningElement {
             doc.text(number, x1, 54, {'maxWidth':50});
             
             doc.setFontSize(10);
-            var today = new Date();
-            var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-            doc.text(releasedDate + " " + date, x + 10, 40);
-            doc.text(postCode, x + 10, 45);
-            doc.text(sampleName + " " + this.Sample.Name, x + 10, 50);
-            doc.text(sampleFor, x + 10, 55);
-            doc.text(createdBy, x + 10, 60);
-            doc.text(vatNo, x + 10, 65);
+            
             doc.rect(12.5, 70, 70,50);
             doc.text(invoiceTo, ix, 75, {"maxWidth":45})
             doc.rect(110, 70, 70, 50);
             doc.text(deliverTo, dx, 75, {"maxWidth":45});
 
             // doc.table(12.5,145, this.firstTableData, this.firstTableHeader, {'autosize':true,'fontSize':12})
-            doc.text(sampleAmount + " " + this.Sample.List_Price__c, x1, 255)
+            if(this.Sample.List_Price__c)
+                doc.text(sampleAmount + " " + this.Sample.Total_Amount__c, x1, 255)
+            else 
+                doc.text(sampleAmount, x1, 255)
             // doc.text(dots, x1-30, 255);
             doc.text(customerName, x + 20, 275, {'maxWidth':150});
             // doc.text(dots, x-10, 275);
