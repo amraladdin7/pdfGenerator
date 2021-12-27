@@ -86,7 +86,7 @@ export default class GenerateInvoice extends LightningElement {
                 number = this.Invoice.OrderNumber;
                 releasedDate = " تاريخ النشر";
                 postCode = " الرمز البريدي";
-                sampleName = " اسم النموذج";
+                sampleName = " اسم الطلب";
                 sampleFor = 'عينة لـ';
                 createdBy = "انشأ من قبل";
                 vatNo = "الرقم الضريبى";
@@ -116,10 +116,13 @@ export default class GenerateInvoice extends LightningElement {
                 doc.text(sampleAmount + this.Invoice.TotalAmount, x1, 255)
                 doc.text("$", x1 - 3, 255)
                 doc.text(createdBy, x + 12.5, 45, {align: alignment});
-                doc.text(this.Invoice.OwnerId, x, 45, {align:alignment})
+                doc.text(this.Invoice.Account.Name, x, 45, {align:alignment})
                 var today = new Date();
                 var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
                 doc.text(releasedDate + date, x+12.5, 40, {align: alignment});
+                doc.text(vatNo, x, 55);
+                if(this.Invoice.VAT_No__c)
+                doc.text(this.Invoice.VAT_No__c, x - 10, 55)
                 // doc.text(this.parsedData.Name, x, 50)
                 // doc.text(this.parsedData.Account__c, x-30, 55)
                 // doc.text(this.parsedData.OwnerId, x -30, 60)
@@ -135,7 +138,7 @@ export default class GenerateInvoice extends LightningElement {
                 number = this.Invoice.OrderNumber;
                 releasedDate = 'Released Date: ';
                 sampleName = 'Invoice Name: ';
-                createdBy = 'Created by: ';
+                createdBy = 'Created to: ';
                 vatNo = 'VAT No.';
                 sampleAmount = 'Total Order Amount: ' ;
                 customerName = 'Customer Signature: ......................................';
@@ -149,10 +152,14 @@ export default class GenerateInvoice extends LightningElement {
                 doc.text(sampleName + this.Invoice.OrderNumber, x, 50);
                 doc.table(12.5,150, this.secondTableData, this.secondTableHeader, {'autosize':true,'fontSize':12})
                 doc.text(sampleAmount + this.Invoice.TotalAmount + "$", x1, 255)
-                doc.text(createdBy + this.Invoice.OwnerId, x, 45);
+                doc.text(createdBy + this.Invoice.Account.Name, x, 45);
                 var today = new Date();
                 var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
                 doc.text(releasedDate + date, x, 40, {align: alignment});
+                if(this.Invoice.VAT_No__c)
+                doc.text(vatNo + this.Invoice.VAT_No__c, x,55)
+                else
+                doc.text(vatNo, x,55)
                 // doc.text(this.parsedData.Name, x, 50)
                 // doc.text(this.parsedData.Account__c, x, 55)
                 // doc.text(this.parsedData.OwnerId, x, 60)
@@ -174,10 +181,6 @@ export default class GenerateInvoice extends LightningElement {
             
             doc.setFontSize(10);
             
-           
-            
-            
-            doc.text(vatNo, x, 55);
             doc.rect(12.5, 70, 70,50);
             doc.text(invoiceTo, ix, 75, {"maxWidth":45})
             doc.rect(110, 70, 70, 50);
@@ -194,7 +197,7 @@ export default class GenerateInvoice extends LightningElement {
             doc.text(dateX, x1, 285, {'maxWidth':150})
             // doc.text(dots, x1-30, 285);
             
-            doc.save('Invoice.pdf');
+            doc.save(this.Invoice.OrderNumber + '.pdf');
             setTimeout(() =>{
                 this.isLoading = false;
             }, 500);
