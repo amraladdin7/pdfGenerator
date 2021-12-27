@@ -86,10 +86,10 @@ export default class Generate extends LightningElement {
                 note = "رقم";
                 number = this.Quote.Name;
                 releasedDate = " تاريخ النشر";
-                sampleName = " اسم النموذج";
+                sampleName = " اسم المذكرة";
                 createdBy = "انشأ من قبل";
                 vatNo = "الرقم الضريبى";
-                sampleAmount = " اجمالى كمية النموذج";
+                sampleAmount = " اجمالى كمية المذكرة";
                 customerName = 'توقيع العميل';
                 printName = "اسم العميل";
                 dateX = "تاريخ";
@@ -117,7 +117,12 @@ export default class Generate extends LightningElement {
                 doc.text(sampleAmount + this.Quote.TotalPrice, x1, 255)
                 doc.text("$", x1, 255)
                 doc.text(createdBy, x + 5, 50, {align: alignment});
-                doc.text(this.Quote.OwnerId, x - 10, 50, {align:alignment})
+                doc.text(this.Quote.Account.Name, x - 10, 50, {align:alignment})
+                
+                if(this.Quote.VAT_No__c){
+                    doc.text(vatNo, x + 5, 55, {align: alignment});
+                    doc.text(this.Quote.VAT_No__c, x - 10, 55, {align:alignment})
+                }
                 // doc.text(this.parsedData.Name, x, 50)
                 // doc.text(this.parsedData.Account__c, x-30, 55)
                 // doc.text(this.parsedData.OwnerId, x -30, 60)
@@ -132,7 +137,7 @@ export default class Generate extends LightningElement {
                 number = this.Quote.Name;
                 releasedDate = 'Released Date: ';
                 sampleName = 'Quote Name: ';
-                createdBy = 'Created by: ';
+                createdBy = 'Created to: ';
                 vatNo = 'VAT No.';
                 sampleAmount = 'Total Quote Amount: ' ;
                 customerName = 'Customer Signature: ......................................';
@@ -152,7 +157,10 @@ export default class Generate extends LightningElement {
                 doc.text(sampleName + this.Quote.Name, x + 5, 45, {align: alignment});
                 doc.table(12.5,150, this.secondTableData, this.secondTableHeader, {'autosize':true,'fontSize':12})
                 doc.text(sampleAmount + this.Quote.TotalPrice + "$", x1, 255)
-                doc.text(createdBy + this.Quote.OwnerId, x + 5, 50, {align: alignment});
+                doc.text(createdBy + this.Quote.Account.Name, x + 5, 50, {align: alignment});
+                if(this.Quote.VAT_No__c)
+                doc.text(vatNo + this.Quote.VAT_No__c, x + 5, 55, {align: alignment});
+               
             }
 
             doc.setFont("trado");
@@ -171,7 +179,7 @@ export default class Generate extends LightningElement {
             var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
             doc.text(releasedDate + date, x + 5, 40, {align: alignment});
            
-            doc.text(vatNo, x + 5, 55, {align: alignment});
+            
             doc.rect(12.5, 70, 70,50);
             doc.text(invoiceTo, ix, 75, {"maxWidth":45})
             doc.rect(110, 70, 70, 50);
@@ -187,7 +195,7 @@ export default class Generate extends LightningElement {
             doc.text(dateX, x1, 285, {'maxWidth':150})
             // doc.text(dots, x1-30, 285);
             
-            doc.save('Quote.pdf');
+            doc.save(this.Quote.Name + '.pdf');
             setTimeout(() =>{
                 this.isLoading = false;
             }, 500);
