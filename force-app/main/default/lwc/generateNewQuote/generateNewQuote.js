@@ -37,30 +37,30 @@ export default class GenerateNewQuote extends LightningElement {
     }
 
     tableHeader = [{id:'SN', name:'SN', prompt:'SN', width:20, align:'center', padding:0},
-                {id:'ISBN', name:'ISBN', prompt:'ISBN', width:30, align:"center", padding:0},
+                {id:'ISBN', name:'ISBN', prompt:'ISBN', width:36, align:"center", padding:0},
                 {id:'Edition', name:'Edition', prompt:'Edition', width:30, align:'center', padding:0},
                 {id:'Description', name:'Description', prompt:'Description', width:45, align:'center', padding:0},
-                {id:'Unit', name:'Unit', prompt:'Unit', width:25, align:'center', padding:0},
+                {id:'Unit', name:'Unit', prompt:'Unit', width:22, align:'center', padding:0},
                 {id:'Publisher', name:'Publisher', prompt:'Publisher', width:35, align:'center', padding:0},
                 {id:'Grade', name:'Grade', prompt:'Grade', width:25, align:'center', padding:0},
                 {id:'Qty', name:'Qty', prompt:'Qty', width:20, align:'center', padding:0},
                 {id:'KSA Price List', name:'KSA Price List', prompt:'KSA Price List', width:45, align:'center', padding:0},
                 {id:'Discount %', name:'Discount %', prompt:'Discount %', width:30, align:'center', padding:0},
                 {id:'Net Price', name:'Net Price', prompt:'Net Price', width:35, align:'center', padding:0},
-                {id:'Amount SR', name:'Amount SR', prompt:'Amount SR', width:35, align:'center', padding:0}];
+                {id:'Amount SR', name:'Amount SR', prompt:'Amount SR', width:32, align:'center', padding:0}];
 
     tableHeaderArabic = [{id:'SN', name:'SN', prompt:'   ', width:20, align:'center', padding:0},
-                    {id:'ISBN', name:'ISBN', prompt:'   ', width:30, align:"center", padding:0},
+                    {id:'ISBN', name:'ISBN', prompt:'   ', width:36, align:"center", padding:0},
                     {id:'Edition', name:'Edition', prompt:'   ', width:30, align:'center', padding:0},
                     {id:'Description', name:'Description', prompt:'   ', width:45, align:'center', padding:0},
-                    {id:'Unit', name:'Unit', prompt:'   ', width:25, align:'center', padding:0},
+                    {id:'Unit', name:'Unit', prompt:'   ', width:22, align:'center', padding:0},
                     {id:'Publisher', name:'Publisher', prompt:'   ', width:35, align:'center', padding:0},
                     {id:'Grade', name:'Grade', prompt:'   ', width:25, align:'center', padding:0},
                     {id:'Qty', name:'Qty', prompt:'   ', width:20, align:'center', padding:0},
                     {id:'KSA Price List', name:'KSA Price List', prompt:'   ', width:45, align:'center', padding:0},
                     {id:'Discount %', name:'Discount %', prompt:'   ', width:30, align:'center', padding:0},
                     {id:'Net Price', name:'Net Price', prompt:'   ', width:35, align:'center', padding:0},
-                    {id:'Amount SR', name:'Amount SR', prompt:'   ', width:35, align:'center', padding:0}];
+                    {id:'Amount SR', name:'Amount SR', prompt:'   ', width:32, align:'center', padding:0}];
 
     tableData = []
     height = 126.5;
@@ -72,7 +72,7 @@ export default class GenerateNewQuote extends LightningElement {
                 result.push({
                     "SN":`${i+1}`,
                     "ISBN": this.QuoteLineItems[i].Product2.ISBN__c == undefined ? ` ` : `${this.QuoteLineItems[i].Product2.ISBN__c}`,
-                    "Edition": this.QuoteLineItems[i].Product2.Edition__c == undefined ? ` ` : `${this.QuoteLineItems[i].Product2.Edition__c}`,
+                    "Edition": this.QuoteLineItems[i].Product2.Name == undefined ? ` ` : `${this.QuoteLineItems[i].Product2.Name}`,
                     "Description": this.QuoteLineItems[i].Description == undefined ? ` ` : `${this.QuoteLineItems[i].Description}`,
                     "Unit":` `,
                     "Publisher": this.QuoteLineItems[i].Product2.Publisher__c == undefined ? ` ` : `${this.QuoteLineItems[i].Product2.Publisher__c}`,
@@ -80,7 +80,7 @@ export default class GenerateNewQuote extends LightningElement {
                     "Qty":  this.QuoteLineItems[i].Quantity == undefined ? ` ` : `${this.QuoteLineItems[i].Quantity}`,
                     "KSA Price List": this.QuoteLineItems[i].Subtotal == undefined ? ` ` : `${this.QuoteLineItems[i].Subtotal}` + "SR",
                     "Discount %": this.QuoteLineItems[i].Discount == undefined ? ` ` : `${this.QuoteLineItems[i].Discount}` + "%",
-                    "Net Price":this.QuoteLineItems[i].ListPrice == undefined ? ` ` : `${this.QuoteLineItems[i].ListPrice}` + "SR",
+                    "Net Price":this.QuoteLineItems[i].TotalPrice == undefined ? ` ` : `${this.QuoteLineItems[i].TotalPrice}` + "SR",
                     "Amount SR":this.QuoteLineItems[i].TotalPrice == undefined ? ` ` : `${this.QuoteLineItems[i].TotalPrice}` + "SR"
                 });
                 this.height += 10;
@@ -225,7 +225,7 @@ export default class GenerateNewQuote extends LightningElement {
             this.Quote.Total_with_VAT__c == undefined ? doc.text( "", 270, this.height + 5) : doc.text(this.Quote.Total_with_VAT__c + "", 272, this.height + 5);
             doc.text("Sub. Total Before VAT", 175, this.height + 25);
             doc.text("الصافى قبل ضربية القيمة المضافة", 225, this.height + 25);
-            this.Quote.Subtotal == undefined ? doc.text( "", 270, this.height + 5) : doc.text(this.Quote.Subtotal + "", 270, this.height + 25);
+            this.Quote.TotalPrice == undefined ? doc.text( "", 270, this.height + 5) : doc.text(this.Quote.TotalPrice + "", 272, this.height + 25);
             doc.text("VAT 15%", 180, this.height + 35);
             doc.text("ضربية القيمة المضافة %15", 230, this.height + 35);
             this.Quote.VAT_Amount__c == undefined ? doc.text( "", 270, this.height + 5) : doc.text(this.Quote.VAT_Amount__c + "", 272, this.height + 35);
