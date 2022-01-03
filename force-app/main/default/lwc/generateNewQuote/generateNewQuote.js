@@ -74,13 +74,13 @@ export default class GenerateNewQuote extends LightningElement {
                     "ISBN": this.QuoteLineItems[i].Product2.ISBN__c == undefined ? ` ` : `${this.QuoteLineItems[i].Product2.ISBN__c}`,
                     "Edition": this.QuoteLineItems[i].Product2.Edition__c == undefined ? ` ` : `${this.QuoteLineItems[i].Product2.Edition__c}`,
                     "Description": this.QuoteLineItems[i].Description == undefined ? ` ` : `${this.QuoteLineItems[i].Description}`,
-                    "Unit":this.QuoteLineItems[i].Unit_Cost__c == undefined ? ` ` : `${this.QuoteLineItems[i].Unit_Cost__c}` + "SR",
+                    "Unit":` `,
                     "Publisher": this.QuoteLineItems[i].Product2.Publisher__c == undefined ? ` ` : `${this.QuoteLineItems[i].Product2.Publisher__c}`,
                     "Grade": this.QuoteLineItems[i].Product2.Grade__c == undefined ? ` ` : `${this.QuoteLineItems[i].Product2.Grade__c}`,
                     "Qty":  this.QuoteLineItems[i].Quantity == undefined ? ` ` : `${this.QuoteLineItems[i].Quantity}`,
-                    "KSA Price List": this.QuoteLineItems[i].ListPrice == undefined ? ` ` : `${this.QuoteLineItems[i].ListPrice}` + "SR",
+                    "KSA Price List": this.QuoteLineItems[i].Subtotal == undefined ? ` ` : `${this.QuoteLineItems[i].Subtotal}` + "SR",
                     "Discount %": this.QuoteLineItems[i].Discount == undefined ? ` ` : `${this.QuoteLineItems[i].Discount}` + "%",
-                    "Net Price":this.QuoteLineItems[i].TotalPrice == undefined ? ` ` : `${this.QuoteLineItems[i].TotalPrice}` + "SR",
+                    "Net Price":this.QuoteLineItems[i].ListPrice == undefined ? ` ` : `${this.QuoteLineItems[i].ListPrice}` + "SR",
                     "Amount SR":this.QuoteLineItems[i].TotalPrice == undefined ? ` ` : `${this.QuoteLineItems[i].TotalPrice}` + "SR"
                 });
                 this.height += 10;
@@ -222,17 +222,16 @@ export default class GenerateNewQuote extends LightningElement {
             doc.setFont("trado");
             doc.text("Total", 180, this.height + 5);
             doc.text("الاجمالى", 230, this.height +5);
-            console.log(this.Quote.Subtotal);
-            this.Quote.Subtotal == undefined ? doc.text( "", 270, this.height + 5) : doc.text(this.Quote.Subtotal + "", 272, this.height + 5);
+            this.Quote.Total_with_VAT__c == undefined ? doc.text( "", 270, this.height + 5) : doc.text(this.Quote.Total_with_VAT__c + "", 272, this.height + 5);
             doc.text("Sub. Total Before VAT", 175, this.height + 25);
             doc.text("الصافى قبل ضربية القيمة المضافة", 225, this.height + 25);
             this.Quote.Subtotal == undefined ? doc.text( "", 270, this.height + 5) : doc.text(this.Quote.Subtotal + "", 270, this.height + 25);
             doc.text("VAT 15%", 180, this.height + 35);
             doc.text("ضربية القيمة المضافة %15", 230, this.height + 35);
-            this.Quote.VAT_No__c == undefined ? doc.text( "", 270, this.height + 5) : doc.text(this.Quote.VAT_No__c + "", 272, this.height + 35);
+            this.Quote.VAT_Amount__c == undefined ? doc.text( "", 270, this.height + 5) : doc.text(this.Quote.VAT_Amount__c + "", 272, this.height + 35);
             doc.text("Total Amount Including VAT", 172, this.height + 45);
             doc.text("إجمالي القيمة شاملا ضريبة القيمة المضافة", 225, this.height + 45);
-            this.Quote.TotalPrice == undefined ? doc.text( "", 270, this.height + 5) : doc.text(this.Quote.TotalPrice + "", 272, this.height + 45);
+            this.Quote.Total_with_VAT__c == undefined ? doc.text( "", 270, this.height + 5) : doc.text(this.Quote.Total_with_VAT__c + "", 272, this.height + 45);
 
             if(this.height + 135 > 195){
                 doc.addPage({format:"a4",orientation:"l"});
