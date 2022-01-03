@@ -2,7 +2,6 @@
     <lightning-card>
         <c-input-text ontextchange={handleTextChange}></c-input-text>
         <c-description ondescriptionchange={handleDescriptionChange}></c-description>
-        <c-language-selector onlanguagechange={handleLanguageChange}></c-language-selector>
-        <c-generate-contract text={text} language={language} tem={tem} description={description}></c-generate-contract>
+        <c-generate-new-contract text={text} tem={tem} description={description}></c-generate-new-contract>
     </lightning-card>
 </template>
