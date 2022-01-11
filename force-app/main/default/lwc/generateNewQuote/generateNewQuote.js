@@ -5,6 +5,7 @@ import tradoFont from '@salesforce/resourceUrl/trado';
 import QuoteToGenerate from '@salesforce/apex/QuoteGetter.QuoteToGenerate';
 import tihamaLogo from '@salesforce/resourceUrl/tihamaLogo';
 import harcourt from '@salesforce/resourceUrl/harcourt';
+import houghton from '@salesforce/resourceUrl/houghton';
 
 export default class GenerateNewQuote extends LightningElement {
     @track isLoading = false;
@@ -20,6 +21,7 @@ export default class GenerateNewQuote extends LightningElement {
             this.Quote = result.data;
             this.QuoteLineItems = this.Quote.QuoteLineItems;
             this.tableData = this.generateTableData();
+            console.log(this.Quote)
         } else {
             console.log(result.error);
         }
@@ -71,7 +73,7 @@ export default class GenerateNewQuote extends LightningElement {
             for(let i = 0; i<this.QuoteLineItems.length; i++){
                 result.push({
                     "SN":`${i+1}`,
-                    "ISBN": this.QuoteLineItems[i].Product2.ISBN__c == undefined ? ` ` : `${this.QuoteLineItems[i].Product2.ISBN__c}`,
+                    "ISBN": this.QuoteLineItems[i].Product2.ProductCode == undefined ? ` ` : `${this.QuoteLineItems[i].Product2.ProductCode}`,
                     "Edition": this.QuoteLineItems[i].Product2.Name == undefined ? ` ` : `${this.QuoteLineItems[i].Product2.Name}`,
                     "Description": this.QuoteLineItems[i].Description == undefined ? ` ` : `${this.QuoteLineItems[i].Description}`,
                     "Unit":` `,
@@ -101,13 +103,52 @@ export default class GenerateNewQuote extends LightningElement {
                 format: "a4"
             });
 
+            //Cover Page
+            doc.setFontSize(10);
+            const date = new Date();
+            const today = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
+            doc.text('Date of Proposal: ' + today, 10, 10);
+            doc.text('Proposal Expiration Date: ' + this.Quote.ExpirationDate, 220, 10);
+            doc.rect(10, 12.5, 280, 180);
+            const houghtonimage = new Image();
+            houghtonimage.src = houghton;
+            doc.addImage(houghtonimage, 'png', 12, 15, 50, 40);
+            doc.setTextColor(169, 169, 169);
+            doc.setFontSize(28);
+            doc.text("Houghton Mifflin Harcourt", 95, 25);
+            doc.setTextColor(0,0,0);
+            doc.setFontSize(18);
+            doc.text("Proposal #" + this.Quote.Id, 100, 35);
+            doc.setFontSize(14);
+            doc.text("Prepared For", 130, 45);
+            doc.setFontSize(24);
+            doc.text("Tihama Adv & PR Hdg Tihama Dist Co", 80, 55);
+            doc.setFontSize(12);
+            doc.text("King Fahd Rd, Riyadh FR 11412", 120, 65);
+            doc.text("Attention:", 135, 70);
+            doc.text("Hamam Akram, h.akram@tihama.com", 110, 75);
+            doc.setFontSize(20);
+            doc.text("For the Purchase of:", 120, 85);
+            doc.text("HMD Science Fusion National 6-8 2017", 90, 95);
+            doc.setFontSize(10);
+            doc.text("Prepared By", 135, 110);
+            doc.text("Hashim Alhadeedy, hashim.alhadeedy@hmhco.com", 100, 115);
+            doc.setFontSize(12);
+            doc.text("Please submit this proposal with your purchase order.", 100, 125);
+            doc.text("Purchase orders or duly executed service agreements for Professional Services purchased, must be submitted at least 30 days before the service event date.", 150, 135, {maxWidth:190, align:"center"});
+            doc.text("For greater detail, the complete Terms of Purchases may be reviewed here: ", 80, 150);
+            doc.text("http://www.hmhco.com/common/terms-conditions", 100, 155);
+
+
+            //Quote
+            doc.addPage({format:"a4",orientation:'l'})
             //Logos
+            doc.setTextColor(0,0,0);
             const tihama = new Image();
             tihama.src = tihamaLogo;
             const har = new Image();
             har.src = harcourt;
-            const date = new Date();
-            const today = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
+            
 
             //Header
             doc.setFontSize(10);
@@ -291,9 +332,10 @@ export default class GenerateNewQuote extends LightningElement {
             this.height += 85;
 
 
-            doc.save("Quote.pdf");
+            doc.save(this.Quote.Name + ".pdf");
             setTimeout(() =>{
                 this.isLoading = false;
+                this.height = 126.5;
             }, 500);
         }
         catch(error){
