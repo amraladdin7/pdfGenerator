@@ -3,7 +3,7 @@ public with sharing class ContractGetter {
     public static Contract ContractToGet(string contractId) {
         try {
             String query = 'SELECT '
-                     + 'Name, ContractNumber, Account.Name, EndDate, StartDate '
+                     + 'Name, ContractNumber, Account.Name, EndDate, StartDate, Description, SpecialTerms '
                      + 'FROM Contract';
             if (String.isNotBlank(contractId)) {
                 query += ' WHERE Id = :contractId';
