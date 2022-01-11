@@ -29,37 +29,35 @@ export default class ListViewProducts extends LightningElement {
 
     search(){
         try{
-            console.log("search")
             //Getting ISBNs & Quantities
-            //Format ISBN Quantity Discount%
+            //Format: ISBN_Quantity_Discount%
+            //Format: ISBN_Quantity_
+            //_ is a space 
             let tmp = "";
-            console.log(this.text.length)
-            for(let i = 0; i<this.text.length; i++){
-                if(this.text[i] != " " && this.text[i] != "%"){
-                    tmp += this.text[i];
-                    console.log(tmp);
+            const splittedtext = this.text.split('\n');
+            for(let i = 0; i<splittedtext.length; i++){
+                for(let j = 0; j<splittedtext[i].length; j++)
+                if(splittedtext[i][j] != " " && splittedtext[i][j] != "%"){
+                    tmp += splittedtext[i][j];
                 }
                 else if(tmp.length == 13){
                     this.ISBNs.push(tmp);
-                    console.log(tmp);
                     tmp = "";
                 }
-                else if(this.text[i] == " "){
+                else if(splittedtext[i][j] == " "){
                     this.Quantities.push(tmp);
-                    console.log(tmp)
                     tmp = "";
                 }
-                else if(this.text[i] == "%"){
+                else if(splittedtext[i][j] == "%"){
                     this.Discounts.push(tmp);
                     tmp = "";
                 }
             }
-            console.log(this.ISBNs + " " + this.Quantities + " " + this.Discounts);
+
             //Getting the Products with matching ISBNs
             let ISBNCounter = 0;
             for(let i = 0; i<this.Products.length; i++){
                 if(this.Products[i].ProductCode == this.ISBNs[ISBNCounter] && this.Products[i].ProductCode){
-                    console.log(this.Products[i].ProductCode == this.ISBNs[ISBNCounter]);
                     this.ProductsData.push(this.Products[i]);
                     ISBNCounter ++;
                 }
