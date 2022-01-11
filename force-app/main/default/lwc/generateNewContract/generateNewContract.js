@@ -68,8 +68,8 @@ export default class GenerateNewContract extends LightningElement {
             doc.text(endpara + this.Contract.EndDate, 70, 70, {align:"right"})
             let conditions = "الشروط المحددة لهذا العقد هي كما يلي"
             doc.text(conditions, 180, 90, {align:"right"})
-            doc.text(this.text, 30, 100);
-            doc.text(this.description, 25, 140, {maxWidth:170});
+            this.Contract.SpecialTerms != undefined ? doc.text(this.Contract.SpecialTerms, 30, 100, {maxWidth:170}) : doc.text("", 30, 100);
+            this.Contract.Description != undefined ? doc.text(this.Contract.Description, 25, 140, {maxWidth:170}) : doc.text("", 25,140);
 
 
             doc.text("______________________________", 40, 200);
