@@ -56,12 +56,15 @@ export default class ListViewProducts extends LightningElement {
 
             //Getting the Products with matching ISBNs
             let ISBNCounter = 0;
-            for(let i = 0; i<this.Products.length; i++){
-                if(this.Products[i].ProductCode == this.ISBNs[ISBNCounter] && this.Products[i].ProductCode){
-                    this.ProductsData.push(this.Products[i]);
-                    ISBNCounter ++;
-                }
-            }
+            this.ISBNs.forEach((element)=>{
+                this.ProductsData.push(this.Products.find(isbn => isbn.ProductCode == element))
+            })
+            // for(let i = 0; i<this.Products.length; i++){
+            //     if(this.Products[i].ProductCode == this.ISBNs[ISBNCounter] && this.Products[i].ProductCode){
+            //         this.ProductsData.push(this.Products[i]);
+            //         ISBNCounter ++;
+            //     }
+            // }
             console.log(this.ProductsData);
     }
     catch(e){
