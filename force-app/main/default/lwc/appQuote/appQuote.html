@@ -1,5 +1,7 @@
 <template>
     <lightning-card>
-        <c-generate-new-quote text={text} tem={tem}></c-generate-new-quote>
+        <c-english-payment-terms ontextchange={handleEnglishTextChange}></c-english-payment-terms>
+        <c-arabic-payment-terms ontextchange={handleArabicTextChange}></c-arabic-payment-terms>
+        <c-generate-new-quote englishtext={englishText} arabictext={arabicText} tem={tem}></c-generate-new-quote>
     </lightning-card>
 </template>
