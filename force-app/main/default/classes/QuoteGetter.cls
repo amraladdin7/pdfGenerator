@@ -3,7 +3,7 @@ public with sharing class QuoteGetter {
     public static Quote QuoteToGenerate(String quoteId){
         try {
             String query = 'SELECT '
-                     + 'Name, Profit_Margin__c, Total_with_VAT__c, ShippingName, Owner.Name, Account.Name, VAT_Amount__c, Subtotal, TotalPrice, ExpirationDate, '
+                     + 'Name, Profit_Margin__c, Total_with_VAT__c, ShippingName, Owner.Name, Account.Name, VAT_Amount__c, Subtotal, TotalPrice, ExpirationDate, ShippingHandling, '
                      + '(SELECT Product2.Name, Description, Quantity, ListPrice, Unit_Cost__c, Subtotal, Discount, TotalPrice, Product2.ProductCode, Product2.Publisher__c FROM QuoteLineItems) '
                      + 'FROM Quote';
             if (String.isNotBlank(quoteId)) {
