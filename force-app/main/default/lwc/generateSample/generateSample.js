@@ -8,9 +8,8 @@ import UserPermissionsCallCenterAutoLogin from '@salesforce/schema/User.UserPerm
 
 export default class GenerateSample extends LightningElement {
     @track isLoading = false;
-    @api text;
-    @api language;
-    @api tem;
+    @api englishtext;
+    @api arabictext;
     @track startX = 10;
     sampleId;
     Sample;
@@ -21,8 +20,8 @@ export default class GenerateSample extends LightningElement {
         if(result.data) {
             this.Sample = result.data;
             this.sampleProducts = this.Sample.Sample_Products__r;
-            console.log(this.sampleProducts)
-            this.secondTableData = this.generateDataValues();
+            this.tableData = this.generateTableData();
+            console.log(this.Sample)
         }
         else {
             console.log(result.error)
@@ -36,199 +35,195 @@ export default class GenerateSample extends LightningElement {
         this.jspdfLoaded = true;
         Promise.all([loadScript(this,jspdf)])
         .then(() => {
-            console.log(this);
             let pathname = window.location.pathname;
             this.sampleId = pathname.substring(23, 41);
         });
     }
-    secondTableHeader = [{id:'No.', name:'No.', prompt:'No.', width:20, align:'center', padding:0},
-                        {id:'Quantity.', name:'Quantity.', prompt:'Quantity.', width:105, align:'center', padding:0},
-                        {id:'Product Name', name:'Product Name', prompt:'Product Name', width:105, align:'center', padding:0}
-                    ];
-    secondTableHeaderArabic = [{id:'Product Name', name:'Product Name', prompt:'           ', width:105, align:'center', padding:0},
-                    {id:'Quantity.', name:'Quantity.', prompt:'          ', width:105, align:'center', padding:0},
-                    {id:'No.', name:'No.', prompt:'     ', width:20, align:'center', padding:0}  
-                ];
-    
-    secondTableData = [];
-    generate() {
-        this.isLoading = true;
+    tableHeader = [{id:'SN', name:'SN', prompt:'SN', width:20, align:'center', padding:0},
+                {id:'ISBN', name:'ISBN', prompt:'ISBN', width:70, align:"center", padding:0},
+                {id:'Edition', name:'Edition', prompt:'Edition', width:35, align:'center', padding:0},
+                {id:'Description', name:'Description', prompt:'Description', width:70, align:'center', padding:0},
+                {id:'Unit', name:'Unit', prompt:'Unit', width:22, align:'center', padding:0},
+                {id:'Publisher', name:'Publisher', prompt:'Publisher', width:50, align:'center', padding:0},
+                {id:'Grade', name:'Grade', prompt:'Grade', width:25, align:'center', padding:0},
+                {id:'Qty', name:'Qty', prompt:'Qty', width:20, align:'center', padding:0},
+                {id:'Notes', name:'Notes', prompt:'Notes', width:60, align:'center', padding:0}];
+
+    tableHeaderArabic = [{id:'SN', name:'SN', prompt:'   ', width:20, align:'center', padding:0},
+                    {id:'ISBN', name:'ISBN', prompt:'   ', width:70, align:"center", padding:0},
+                    {id:'Edition', name:'Edition', prompt:'   ', width:35, align:'center', padding:0},
+                    {id:'Description', name:'Description', prompt:'   ', width:70, align:'center', padding:0},
+                    {id:'Unit', name:'Unit', prompt:'   ', width:22, align:'center', padding:0},
+                    {id:'Publisher', name:'Publisher', prompt:'   ', width:50, align:'center', padding:0},
+                    {id:'Grade', name:'Grade', prompt:'   ', width:25, align:'center', padding:0},
+                    {id:'Qty', name:'Qty', prompt:'   ', width:20, align:'center', padding:0},
+                    {id:'Notes', name:'Notes', prompt:'     ', width:60, align:'center', padding:0}];
+
+    tableData = []
+    height = 97;
+
+    generateTableData(){
         try{
-            const {jsPDF} = window.jspdf;
-            const doc = new jsPDF({
-                format: "a4"
-            });
-            
-            if(this.language == undefined) {
-                this.language = 'Arabic';
+            let result = [];
+            for(let i = 0; i<this.sampleProducts.length; i++){
+                result.push({
+                    "SN":`${i+1}`,
+                    "ISBN": this.sampleProducts[i].Product__r.ProductCode == undefined ? ` ` : `${this.sampleProducts[i].Product__r.ProductCode}`,
+                    "Edition": this.sampleProducts[i].Product__r.Name == undefined ? ` ` : `${this.sampleProducts[i].Product__r.Name}`,
+                    "Description": this.sampleProducts[i].Description == undefined ? ` ` : `${this.sampleProducts[i].Description}`,
+                    "Unit":` `,
+                    "Publisher": this.sampleProducts[i].Product__r.Publisher__c == undefined ? ` ` : `${this.sampleProducts[i].Product__r.Publisher__c}`,
+                    "Grade": this.sampleProducts[i].Product__r.Grade__c == undefined ? ` ` : `${this.sampleProducts[i].Product__r.Grade__c}`,
+                    "Qty":  this.sampleProducts[i].Quantity == undefined ? ` ` : `${this.sampleProducts[i].Quantity}`
+                });
+                this.height += 20;
             }
-
-            let title, delivery, note, number = "";
-            let releasedDate, postCode, sampleName, sampleFor, dateX = "";
-            let createdBy, vatNo, sampleAmount, customerName, printName, alignment = "";
-            let x,x1,ix,dx;
-            let invoiceTo, deliverTo;
-
-            if(this.language == "Arabic"){
-                doc.addFont(tradoFont, "trado", "normal");
-                doc.setFont("trado");
-                this.startX = 150; 
-                doc.setFontSize(24)
-                title = "تهامة القابضة";
-                x = 150;
-                x1 = 60;
-                delivery ="نموذج";
-                note = "رقم";
-                number = this.Sample.Name;
-                releasedDate = " تاريخ النشر";
-                postCode = " الرمز البريدي";
-                sampleName = " اسم النموذج";
-                sampleFor = 'عينة لـ';
-                createdBy = "انشأ من قبل";
-                vatNo = "الرقم الضريبى";
-                sampleAmount = "اجمالى كمية النموذج";
-                customerName = 'توقيع العميل';
-                printName = "اسم العميل";
-                dateX = "تاريخ";
-                invoiceTo = 'النموذج الى';
-                deliverTo = 'توصيل الى';
-                ix = 70;
-                dx = 169;
-                // doc.setFontSize(18)
-                // let no = 'رقم';
-                // let na = 'اسم المنتج';
-                // doc.text(no ,173,157);
-                // doc.text(na ,70,157);
-                alignment = "right"
-                doc.setFontSize(10);
-                doc.text(sampleName, x + 20, 45, {align: alignment});
-                doc.text(this.Sample.Name, x, 45, {align: alignment});
-                doc.text(createdBy, x + 20, 50, {align: alignment});
-                doc.text(this.Sample.Account__r.Name, x, 50, {align:alignment})
-                var today = new Date();
-                var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-                doc.text(releasedDate + " " + date, x + 20, 40, {align:alignment});
-                doc.table(12.5,150, this.secondTableData, this.secondTableHeaderArabic, {'autosize':true,'fontSize':0});
-                doc.setFontSize(18); 
-                doc.setFont("trado");
-                let no = 'رقم';
-                let qu = 'الكمية';
-                let na = 'اسم المنتج';
-                doc.text(no ,173,157);
-                doc.text(qu ,127,157);
-                doc.text(na ,43,157);
-                // doc.text(this.parsedData.Name, x, 50)
-                // doc.text(this.parsedData.Account__c, x-30, 55)
-                // doc.text(this.parsedData.OwnerId, x -30, 60)
-                // doc.text(this.parsedData.Total_Amount__c, x1 - 10, 255);
-            } else {
-                this.startX = 40;
-                x = 12.5;
-                x1 = 110;
-                title = 'Tihama Holding';
-                delivery = "SAMPLE"
-                note = "NO.";
-                number = this.Sample.Name;
-                releasedDate = 'Released Date: ';
-                postCode = 'Postcode';
-                sampleName = 'Sample Name: ';
-                sampleFor = 'Sample for: ';
-                createdBy = 'Created to: ';
-                vatNo = 'VAT No.';
-                sampleAmount = 'Total Sample Amount: ' ;
-                customerName = 'Customer Signature: ......................................';
-                printName = 'Print Name: ...................................';
-                dateX = 'Date: ................';
-                invoiceTo = 'Sample to:';
-                deliverTo = 'Deliver to:';
-                ix = 14;
-                dx = 113;
-                alignment = "left"
-                doc.setFontSize(10);
-                doc.text(sampleName + " " + this.Sample.Name, x, 45);
-                doc.text(createdBy + this.Sample.Account__r.Name, x, 50);
-                var today = new Date();
-                var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-                doc.text(releasedDate + " " + date, x, 40, {align:alignment});
-                doc.table(12.5,150, this.secondTableData, this.secondTableHeader, {'autosize':true,'fontSize':12})
-                // doc.text(this.parsedData.Name, x, 50)
-                // doc.text(this.parsedData.Account__c, x, 55)
-                // doc.text(this.parsedData.OwnerId, x, 60)
-                // doc.text(this.parsedData.Total_Amount__c, x1 - 10, 255);
-                // this.secondTableData = this.generateDataValues();
-                // doc.table(12.5,150, this.secondTableData, this.secondTableHeader, {'autosize':true,'fontSize':12})
-            }
-
-            doc.setFont("trado");
-
-            doc.setFontSize(24)
-            doc.text(title, x, 35);
-            doc.text(delivery, x1, 35, {'maxWidth':50});
-            var img = new Image();
-            img.src = logo;
-            doc.setFontSize(20);
-            doc.addImage(img, 'png', 150,0,45,25);
-            doc.text(note, x1, 42, {'maxWidth':50});
-            doc.text(number, x1, 54, {'maxWidth':50});
-            
-            doc.setFontSize(10);
-            
-            doc.rect(12.5, 70, 70,50);
-            doc.text(invoiceTo, ix, 75, {"maxWidth":45})
-            doc.rect(110, 70, 70, 50);
-            doc.text(deliverTo, dx, 75, {"maxWidth":45});
-
-            // doc.table(12.5,145, this.firstTableData, this.firstTableHeader, {'autosize':true,'fontSize':12})
-            
-            // doc.text(dots, x1-30, 255);
-            doc.text(customerName, x + 20, 275, {'maxWidth':150});
-            // doc.text(dots, x-10, 275);
-            doc.text(printName, x + 20, 285, {'maxWidth':150});
-            // doc.text(dots, x - 10, 285);
-            doc.text(dateX, x1, 285, {'maxWidth':150})
-            // doc.text(dots, x1-30, 285);
-            
-            doc.save(this.Sample.Name + '.pdf');
-            setTimeout(() =>{
-                this.isLoading = false;
-            }, 500);
-            // this.isLoading = false;
+            console.log(result)
+            return result;
         }
         catch(error){
             console.log(error);
         }
     }
-    generateDataValues(){
-        try {
-            var result = [];
-        for(let i = 0; i<this.sampleProducts.length; i++){
-            console.log(this.sampleProducts[i]);
-            result.push({
-                "No.": `${i+1}`,
-                "Quantity.": `${this.sampleProducts[i].Quantity__c}`,
-                "Product Name": `${this.sampleProducts[i].Product__r.Name}`
-            })
+                
+    generate() {
+        this.isLoading = true;
+        try{
+            const {jsPDF} = window.jspdf;
+            const doc = new jsPDF({
+                format: "a4",
+                orientation:"l"
+            });
+            
+            const tihama = new Image();
+            tihama.src = logo;
+            const date = new Date();
+            const today = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate();
+
+            //Header
+            doc.setFontSize(8);
+            doc.text("Tihama Distribution Company", 12.5, 12.5);
+            doc.text("Ltd Company - C.R. Number: 4030032382", 12.5, 15);
+            doc.text("VAT Registration Number: 300249061500003", 12.5, 17.5);
+            doc.text("Head Office: Riyadh - AlMohamadia - Kind Fahad Road - AlAoula Building P.O.Box: 4681 - Riyadh 11412", 12.5,20, {maxWidth:90});
+            doc.text("Branch: Jeddah - AlAndalus Street, South West of AlHamra District P.O.Box: 5455 - Jeddah 21422",12.5,27, {maxWidth:90});
+            doc.text("Tel.: +966 11 207 9767 - Fax: +966 11 207 9604", 12.5, 33);
+            doc.addImage(tihama, 'png', 135, 12.5, 40, 25);
+            // doc.addImage(har, 'png', 150, 15, 40, 25);
+
+            doc.addFont(tradoFont, "trado", "normal");
+            doc.setFont("trado");
+            doc.text("شركة تهامة للتوزيع", 285, 12.5, {align:"right"});
+            doc.text("شركة ذات مسئولية محدودة - سجل تجاري : 4030032382", 285, 15, {align:"right"});
+            doc.text("رقم التسجيل فى ضربية القيمة المضافة: 300249061500003", 285, 17.5, {align:"right"});
+            doc.text("الإدارة - الرياض - حي المحمدية- بناية الأولى- طريق الملك فهد", 285, 20, {maxWidth:90, align:"right"});
+            doc.text("فرع جدة: جدة - حى الحمراء - شارع الاندلس - جنوب غرب قصر الحمراء ص.ب: 5455 - جدة 21422", 285, 22.5, {maxWidth:90, align:"right"});
+            doc.text("هاتف :  9767 207 11 00966    -  فاكس :  9604 207 11 00966 ", 285, 27.5, {align:"right"})
+
+            //Header Tables 
+            doc.setFillColor(255, 182, 193);
+            doc.setFontSize(8);
+
+            //Left Hand Side
+            doc.rect(12.5, 35, 70, 30);
+            doc.rect(52.5, 35, 30, 30, "FD");
+            
+            doc.rect(12.5, 35, 70, 10);
+            doc.rect(12.5, 45, 70, 10);
+            doc.rect(12.5, 55, 70, 10);
+            doc.text(this.Sample.Name, 30, 40, {align:"center"});
+            doc.text(today, 30, 50, {align:"center"});
+            doc.text(this.Sample.Owner.Name, 30, 60, {align:"center"});
+
+            doc.rect(52.5, 35, 30, 5);
+            doc.rect(52.5, 45, 30, 5);
+            doc.rect(52.5, 55, 30, 5);
+            doc.text("رقم امر البيع", 70, 38, {align:"center"});
+            doc.text("Sales Order Reference", 68, 43, {align:"center"});
+            doc.text("تاريخ", 70, 48, {align:"center"});
+            doc.text("Date", 70, 53, {align:"center"});
+            doc.text("البائع", 70, 58, {align:"center"});
+            doc.text("Salesman", 70, 63, {align:"center"});
+
+            //Right Hand Side
+            doc.setFillColor(255, 182, 193);
+            doc.rect(215, 35, 70, 30);
+            doc.rect(255, 35, 30, 30, "FD");
+            
+            doc.rect(215, 35, 70, 10);
+            doc.rect(215, 45, 70, 10);
+            doc.rect(215, 55, 70, 10);
+            doc.text(this.Sample.Account__r.Id + "", 235, 40, {align:"center"});
+            doc.text(this.Sample.Account__r.Name, 235, 50, {align:"center"});
+            
+            doc.rect(255, 35, 30, 5);
+            doc.rect(255, 45, 30, 5);
+            doc.rect(255, 55, 30, 5);
+            doc.text("رقم العميل", 270, 38, {align:"center"});
+            doc.text("Customer A/C", 270, 43, {align:"center"});
+            doc.text("اسم العميل", 270, 48, {align:"center"});
+            doc.text("Customer Name", 270, 53, {align:"center"});
+            doc.text("العنوان", 270, 58, {align:"center"});
+            doc.text("Address", 270, 63, {align:"center"});
+           
+            doc.setFontSize(20);
+            doc.text("فاتورة مبيعات", 115, 45);
+            doc.text("Sales Invoice", 115, 55);
+            doc.text("No. " + this.Sample.Id, 115, 65);
+
+            //Main Table
+            doc.setFontSize(16);
+            doc.table(8, 70, [], this.tableHeaderArabic);
+            doc.setFont("trado");
+            doc.text("التسلسل", 10, 75);
+            doc.text("رقم الصنف الدولي", 35, 75);
+            doc.text("الطبعة", 85, 75);
+            doc.text("البيان", 125, 75);
+            doc.text("الوحدة", 160, 75);
+            doc.text("الناشر", 185, 75);
+            doc.text("الصف", 215, 75);
+            doc.text("الكمية", 232, 75);
+            doc.text("ملاحظات", 253, 75);
+            doc.table(8, 80, [], this.tableHeader);
+            
+            if(this.height > 170){
+                doc.addPage({format:"a4", orientation:"l"});
+                this.height = 15;
+            }
+            
+            doc.setFontSize(12);
+            doc.setFont("trado");
+            doc.text("General Terms and Conditions الشروط العامة", 115, this.height);
+            doc.setFontSize(8);
+            doc.text("1- The signature of one of your employees on the delivery documentation means you have received and accepted all the delivered items in good condition.", 12.5, this.height + 5, {maxWidth:100});
+            doc.text("2- For items containing online components, the Activation Codes will be sent separately to the nominated authorized person.", 12.5, this.height + 12);
+            doc.text("3- If there is a difference between quantities per the delivery documentation and those physically received, please notify us within 48 hours of receipt, otherwise the quantities per the delivery documentation will be considered correct.", 12.5, this.height + 15, {maxWidth:100});
+            doc.text("4- Sample Quantities to be returned to Tihama, if there is no Sales/Order against received Sample Books", 12.5, this.height + 25);
+            doc.text("ان توقيع احد مندوبيكم على المستند يعنى استلامكم لكامل الكميات المذكورة بحالة البيع.", 285, this.height + 5, {align:"right"});
+            doc.text("الاصناف التى تحتوى على مكونات اونلاين سيتم ارسال اكواد التفعيل الى المفوض من قبلكم.", 285, this.height + 10, {align:"right"});
+            doc.text("فى حالة وجود اختلاف فى الكميات المذكورة اعلاه عن المستلمة فعليا, يرجى افادتنا خلال 48 ساعة من الاستلام والا اعتبرت الكميات صحيحة.", 285, this.height + 15, {align:"right", maxWidth:150});
+            doc.text("بخصوص العينات, لتتم اعادتها بحالة البيع فى حالة عدم الشراء من تهامة خلال 20 يوم من استلامها.", 285, this.height + 20, {align:"right"});
+            
+            this.height += 50;
+            doc.setFontSize(12);
+            doc.text("Name اسم المتسلم", 12.5, this.height);
+            doc.text("__________________", 12.5, this.height + 7);
+            doc.text("Sign توقيع المستلم", 150, this.height);
+            doc.text("__________________", 150, this.height + 7);
+            doc.text("Stamp الختم", 220, this.height);
+            doc.text("__________________", 220, this.height + 7);
+            doc.text("Mobile No. رقم الجوال", 12.5, this.height + 20);
+            doc.text("__________________", 50, this.height + 20);
+
+            doc.save(this.Sample.Name + '.pdf');
+            setTimeout(() =>{
+                this.isLoading = false;
+                this.height = 97;
+            }, 500);
+            // this.isLoading = false;
         }
-            return result;
-        } 
-        catch(e) {
-            console.log(e);
-        }
-    }
-    generateDataValuesArabic(){
-        try {
-            var result = [];
-        for(let i = 0; i<this.sampleProducts.length; i++){
-            result.push({
-                "No.": `${i+1}`,
-                "Quantity.": `${this.sampleProducts[i].Quantity__c}`,
-                "Product Name": `${this.sampleProducts[i].Product__r.Name}`
-            })
-        }
-            return result;
-        } 
-        catch(e) {
-            console.log(e);
+        catch(error){
+            console.log(error);
         }
     }
 }
