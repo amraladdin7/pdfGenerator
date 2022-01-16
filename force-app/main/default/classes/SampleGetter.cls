@@ -3,8 +3,8 @@ public with sharing class SampleGetter {
     public static Sample__c SampleToGet(String sampleId) {
         try {
             String query = 'SELECT '
-                     + 'Name, Total_Amount__c,OwnerId,Account__r.Name, '
-                     + '(SELECT Product__r.Name, Quantity__c FROM Sample_Products__r) '
+                     + 'Name, Total_Amount__c, OwnerId, Owner.Name, Account__r.Name, '
+                     + '(SELECT Product__r.Name, Quantity__c, List_Price__c, Product__r.ProductCode, Product__r.Publisher__c FROM Sample_Products__r) '
                      + 'FROM Sample__c ';
                      if (String.isNotBlank(sampleId)) {
                         query += 'WHERE Id = :sampleId';
