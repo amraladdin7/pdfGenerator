@@ -167,8 +167,8 @@ export default class GenerateSample extends LightningElement {
             doc.text("Address", 270, 63, {align:"center"});
            
             doc.setFontSize(20);
-            doc.text("فاتورة مبيعات", 115, 45);
-            doc.text("Sales Invoice", 115, 55);
+            doc.text("امر بيع", 115, 45);
+            doc.text("Sales Order", 115, 55);
             doc.text("No. " + this.Sample.Id, 115, 65);
 
             //Main Table
@@ -190,7 +190,7 @@ export default class GenerateSample extends LightningElement {
                 doc.addPage({format:"a4", orientation:"l"});
                 this.height = 15;
             }
-            
+
             doc.setFontSize(12);
             doc.setFont("trado");
             doc.text("General Terms and Conditions الشروط العامة", 115, this.height);
