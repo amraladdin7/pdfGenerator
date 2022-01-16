@@ -3,6 +3,15 @@ import { LightningElement } from 'lwc';
 export default class AppInvoice extends LightningElement {
     language;
     src;
+    englishText;
+    arabicText;
+
+    handleEnglishTextChange(event){
+        this.englishText = event.detail.text;
+    }
+    handleArabicTextChange(event){
+        this.arabicText = event.detail.text;
+    }
 
     handleLanguageChange(event) {
         this.language = event.detail.language;
