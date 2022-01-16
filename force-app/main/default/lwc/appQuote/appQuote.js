@@ -4,6 +4,15 @@ export default class AppQuote extends LightningElement {
 
     language;
     src;
+    englishText;
+    arabicText;
+
+    handleEnglishTextChange(event){
+        this.englishText = event.detail.text;
+    }
+    handleArabicTextChange(event){
+        this.arabicText = event.detail.text;
+    }
 
     handleLanguageChange(event) {
         this.language = event.detail.language;
