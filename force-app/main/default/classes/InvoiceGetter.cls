@@ -1,11 +1,11 @@
 public with sharing class InvoiceGetter {
     @AuraEnabled(cacheable = true)
-    public static Order InvoiceToGet(String invoiceId) {
+    public static Opportunity InvoiceToGet(String invoiceId) {
         try {
             String query = 'SELECT '
-                     + 'TotalAmount, Name, OrderNumber, Account.Name,VAT_No__c,ActivatedBy.Name, ' 
-                     + '(SELECT Quantity, TotalPrice, UnitPrice, Product2.Name FROM OrderItems) '
-                     + 'FROM Order';
+                     + 'Name, OrderNumber__c, VAT_No__c, Amount, Owner.Name, Account.Name, ' 
+                     + '(SELECT Quantity, Description, ListPrice, Subtotal, Discount, TotalPrice, UnitPrice, Product2.Name, Product2.ProductCode, Product2.Publisher__c FROM OpportunityLineItems) '
+                     + 'FROM Opportunity';
             if (String.isNotBlank(invoiceId)) {
                 query += ' WHERE Id = :invoiceId';
             }
