@@ -1,6 +1,7 @@
 <template>
     <lightning-card>
-        <c-language-selector onlanguagechange={handleLanguageChange}></c-language-selector>
-        <c-generate-sample text={text} language={language} tem={tem}></c-generate-sample>
+        <c-english-payment-terms ontextchange={handleEnglishTextChange}></c-english-payment-terms>
+        <c-arabic-payment-terms ontextchange={handleArabicTextChange}></c-arabic-payment-terms>
+        <c-generate-sample englishtext={englishText} arabictext={arabicText} language={language} tem={tem}></c-generate-sample>
     </lightning-card>
 </template>
